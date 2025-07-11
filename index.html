@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalStore - Premium Digital Marketplace</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Favicon Placeholder -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Aurora Background Animation */
+        .aurora-hero {
+            position: relative;
+            overflow: hidden;
+            background-color: #0d1117;
+        }
+        .aurora-hero::before, .aurora-hero::after {
+            content: '';
+            position: absolute;
+            width: 1000px;
+            height: 1000px;
+            background-image: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0) 60%);
+            border-radius: 50%;
+            animation: aurora-glow 20s infinite linear;
+            z-index: 0;
+        }
+        .aurora-hero::before {
+            top: -50%;
+            left: -50%;
+        }
+        .aurora-hero::after {
+            bottom: -50%;
+            right: -50%;
+            animation-delay: -10s;
+        }
+        @keyframes aurora-glow {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, 80px) scale(1.2); }
+            50% { transform: translate(0, 160px) scale(0.8); }
+            75% { transform: translate(-100px, 80px) scale(1.2); }
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+        
+        .btn-primary {
+            @apply bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg shadow-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-danger {
+            @apply bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-red-500 transition-all duration-300;
+        }
+        .btn-secondary {
+             @apply bg-gray-700 text-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-gray-500 transition-all duration-300;
+        }
+        .filter-btn {
+            @apply px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 rounded-full cursor-pointer hover:bg-indigo-500 hover:text-white transition-all;
+        }
+        .filter-btn.active {
+            @apply bg-indigo-600 text-white shadow-md;
+        }
+
+        .loader {
+            border: 4px solid #374151;
+            border-top: 4px solid #818cf8;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .modal-overlay { @apply fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50; }
+        .cart-panel { @apply fixed top-0 right-0 h-full w-full max-w-md bg-gray-900 shadow-2xl transform transition-transform duration-500 ease-in-out z-50; }
+        .cart-enter { transform: translateX(100%); }
+        .cart-enter-active { transform: translateX(0); }
+        .cart-leave-active { transform: translateX(100%); }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-gray-900/70 backdrop-blur-lg shadow-lg sticky top-0 z-40">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="text-3xl font-extrabold text-white">
+                <a href="#">Digital<span class="text-indigo-400">Store</span></a>
+            </div>
+            <div id="nav-links" class="hidden md:flex items-center space-x-8 text-base font-medium">
+                <a href="#digital" class="text-gray-300 hover:text-indigo-400 transition-colors">Products</a>
+                <a href="#testimonials" class="text-gray-300 hover:text-indigo-400 transition-colors">Testimonials</a>
+                <a href="#contact" class="text-gray-300 hover:text-indigo-400 transition-colors">Contact</a>
+            </div>
+             <div class="flex items-center space-x-4">
+                <div id="user-info" class="hidden md:flex items-center space-x-2 text-sm"></div>
+                <div id="cart-icon-container" class="relative cursor-pointer group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-300 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-3 bg-indigo-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center border-2 border-gray-900">0</span>
+                </div>
+                <button id="hamburger-btn" class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-900/90 py-4">
+             <a href="#digital" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Products</a>
+             <a href="#testimonials" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Testimonials</a>
+             <a href="#contact" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Contact</a>
+             <div id="mobile-user-info" class="mt-4"></div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="aurora-hero text-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center relative z-10">
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight reveal">Unlock Your Digital Potential</h1>
+                <p class="text-lg md:text-xl text-indigo-200 mb-10 max-w-3xl mx-auto reveal" style="transition-delay: 100ms;">
+                    The world's most trusted marketplace for high-quality digital assets, courses, and premium subscriptions.
+                </p>
+                <a href="#digital" class="bg-white text-indigo-600 font-bold py-4 px-10 rounded-full hover:bg-indigo-100 transition-all duration-300 text-lg shadow-lg transform hover:scale-105 reveal" style="transition-delay: 200ms;">
+                    Start Exploring
+                </a>
+            </div>
+        </section>
+
+        <!-- "Featured In" Section -->
+        <section class="py-16 bg-gray-900">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h3 class="text-center text-sm font-bold text-gray-500 uppercase tracking-widest mb-8">Trusted By The World's Best</h3>
+                <div class="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-4 grayscale opacity-50 invert">
+                    <img src="https://placehold.co/120x40/000000/FFFFFF?text=Forbes" alt="Forbes Logo" class="h-6 md:h-7">
+                    <img src="https://placehold.co/140x40/000000/FFFFFF?text=TechCrunch" alt="TechCrunch Logo" class="h-6 md:h-7">
+                    <img src="https://placehold.co/150x40/000000/FFFFFF?text=TheVerge" alt="The Verge Logo" class="h-6 md:h-7">
+                    <img src="https://placehold.co/130x40/000000/FFFFFF?text=WIRED" alt="Wired Logo" class="h-6 md:h-7">
+                     <img src="https://placehold.co/160x40/000000/FFFFFF?text=Mashable" alt="Mashable Logo" class="h-6 md:h-7">
+                </div>
+            </div>
+        </section>
+        
+        <!-- Search and Filter Bar -->
+        <section id="digital" class="py-16 bg-gray-900/50 backdrop-blur-sm sticky top-[76px] z-30">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="relative flex-grow w-full">
+                        <input type="text" id="search-bar" placeholder="Search for products..." class="w-full p-4 pl-12 text-lg bg-gray-800 border-2 border-gray-700 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow text-white">
+                        <svg class="w-6 h-6 text-gray-400 absolute top-1/2 left-4 transform -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <div id="category-filters" class="flex flex-wrap justify-center gap-2">
+                        <!-- Filter buttons will be injected here -->
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Products Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <div class="loader-container col-span-full flex justify-center items-center h-64"><div class="loader"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="py-24 bg-gray-800/20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl md:text-5xl font-bold text-center text-white mb-16 reveal">Why Creators & Consumers Love Us</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="glass-card p-8 reveal">
+                        <img src="https://i.pravatar.cc/100?u=a" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
+                        <p class="text-gray-300 mb-6 text-lg">"This is the best platform for digital goods. The quality is unmatched and the support is fantastic. I found exactly what I needed for my project."</p>
+                        <h4 class="font-bold text-white text-xl">Sarah Johnson</h4>
+                        <p class="text-sm text-indigo-400">Freelance Designer</p>
+                    </div>
+                    <div class="glass-card p-8 reveal" style="transition-delay: 150ms;">
+                        <img src="https://i.pravatar.cc/100?u=b" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
+                        <p class="text-gray-300 mb-6 text-lg">"I've subscribed to multiple services through DigitalStore. It's so convenient to manage everything in one place. Highly recommended!"</p>
+                        <h4 class="font-bold text-white text-xl">Michael Chen</h4>
+                        <p class="text-sm text-indigo-400">Startup Founder</p>
+                    </div>
+                    <div class="glass-card p-8 reveal" style="transition-delay: 300ms;">
+                        <img src="https://i.pravatar.cc/100?u=c" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
+                        <p class="text-gray-300 mb-6 text-lg">"The courses are top-notch. I've learned more here than from any other online platform. A game-changer for my career."</p>
+                        <h4 class="font-bold text-white text-xl">Priya Patel</h4>
+                        <p class="text-sm text-indigo-400">Software Developer</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+           <div class="grid md:grid-cols-4 gap-8 text-center md:text-left">
+                <div>
+                    <h3 class="text-2xl font-extrabold text-white">Digital<span class="text-indigo-400">Store</span></h3>
+                    <p class="text-gray-400 mt-4">The premier marketplace for digital creators and consumers.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4">Products</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Courses</a></li>
+                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">eBooks</a></li>
+                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Software</a></li>
+                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Subscriptions</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-white mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Press</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-white mb-4">Connect</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Twitter</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Instagram</a></li>
+                    </ul>
+                </div>
+           </div>
+           <div class="mt-12 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
+                <p>&copy; 2025 DigitalStore. All Rights Reserved.</p>
+           </div>
+        </div>
+    </footer>
+
+    <!-- Modals and Panels Container -->
+    <div id="modals-container"></div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4LKIUCq68Rp81c9kN1WSDNAuEedad0Rk",
+            authDomain: "ecomerce-2dd80.firebaseapp.com",
+            projectId: "ecomerce-2dd80",
+            storageBucket: "ecomerce-2dd80.appspot.com",
+            messagingSenderId: "575144591727",
+            appId: "1:575144591727:web:3ee9fe793863506a44e89a"
+        };
+        
+        const appId = firebaseConfig.projectId;
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let allProducts = [];
+        let cart = [];
+        let activeCategory = 'All';
+
+        const productsGrid = document.getElementById('products-grid');
+        const cartCountEl = document.getElementById('cart-count');
+        const modalsContainer = document.getElementById('modals-container');
+        const searchBar = document.getElementById('search-bar');
+        const categoryFiltersContainer = document.getElementById('category-filters');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const userInfo = document.getElementById('user-info');
+        const mobileUserInfo = document.getElementById('mobile-user-info');
+
+        function renderProducts(filter = '', category = 'All') {
+            const searchTerm = filter.toLowerCase();
+            let filteredProducts = allProducts;
+
+            if (category !== 'All') {
+                filteredProducts = filteredProducts.filter(p => p.category === category);
+            }
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            const productsHTML = filteredProducts.map((p, i) => createProductCardHTML(p, i)).join('');
+            productsGrid.innerHTML = productsHTML || `<p class="col-span-full text-center text-gray-400 text-xl py-16">No products found matching your criteria.</p>`;
+            
+            setupScrollAnimations();
+        }
+        
+        function setupCategoryFilters() {
+            const categories = ['All', ...new Set(allProducts.map(p => p.category))];
+            categoryFiltersContainer.innerHTML = categories.map(cat => 
+                `<button class="filter-btn ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</button>`
+            ).join('');
+        }
+
+        function createProductCardHTML(product, index) {
+            const isSubscription = !!product.billing;
+            return `
+                <div class="glass-card flex flex-col reveal" style="transition-delay: ${ (index % 4) * 100}ms;">
+                    <div class="relative">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-52 object-cover rounded-t-lg" onError="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Error';">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <span class="text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">${product.category}</span>
+                        <h3 class="text-lg font-bold text-white mb-2 h-14">${product.name}</h3>
+                        <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">
+                            <p class="text-xl font-extrabold text-white">
+                                ₹${product.price}
+                                ${isSubscription ? `<span class="text-sm font-medium text-gray-400">/mo</span>` : ''}
+                            </p>
+                            <button data-product-id="${product.id}" class="add-to-cart-btn btn-primary text-sm">Add</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function fetchAndRenderProducts() {
+            try {
+                const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
+                const querySnapshot = await getDocs(productsCollection);
+
+                if (querySnapshot.empty) {
+                    await uploadInitialData();
+                    return fetchAndRenderProducts(); 
+                }
+
+                allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                allProducts.sort((a, b) => a.name.localeCompare(b.name));
+                setupCategoryFilters();
+                renderProducts();
+
+            } catch (error) {
+                console.error("Error fetching products: ", error);
+                productsGrid.innerHTML = '<p class="col-span-full text-center text-red-500">Could not load products.</p>';
+            }
+        }
+        
+        async function uploadInitialData() {
+            const sampleProducts = [
+                { id: 'prod_001', name: 'The Complete 2025 Web Development Bootcamp', description: 'Become a Full-Stack Web Developer with just one course. HTML, CSS, Javascript, Node, React, MongoDB and more!', price: 899, imageUrl: 'https://placehold.co/600x400/3498db/ffffff?text=Web+Dev', category: 'Courses' },
+                { id: 'prod_002', name: 'UI/UX Design Masterclass: From Beginner to Pro', description: 'Learn to design beautiful and user-friendly interfaces with Figma. Includes 20+ real-world projects.', price: 749, imageUrl: 'https://placehold.co/600x400/9b59b6/ffffff?text=UI/UX+Design', category: 'Courses' },
+                { id: 'prod_003', name: 'Procreate for Beginners: Digital Illustration', description: 'Learn to draw and paint on your iPad with Procreate. No experience needed!', price: 499, imageUrl: 'https://placehold.co/600x400/e67e22/ffffff?text=Procreate', category: 'Courses' },
+                { id: 'prod_004', name: 'Notion Mastery: The Ultimate Productivity System', description: 'Organize your life and work with the all-in-one workspace, Notion. Includes templates.', price: 299, imageUrl: 'https://placehold.co/600x400/2c3e50/ffffff?text=Notion', category: 'Productivity' },
+                { id: 'prod_005', name: 'Atomic Habits: The eBook', description: 'An Easy & Proven Way to Build Good Habits & Break Bad Ones by James Clear.', price: 199, imageUrl: 'https://placehold.co/600x400/27ae60/ffffff?text=Atomic+Habits', category: 'eBooks' },
+                { id: 'prod_006', name: 'Minimalist Photography Presets for Lightroom', description: 'A collection of 50+ professional presets for Adobe Lightroom to give your photos a clean, modern look.', price: 149, imageUrl: 'https://placehold.co/600x400/f1c40f/ffffff?text=Presets', category: 'Assets' },
+                { id: 'prod_007', name: 'Pro Video-Editing LUTS Pack', description: 'Cinematic color grading LUTS for Premiere Pro, Final Cut Pro, and DaVinci Resolve.', price: 249, imageUrl: 'https://placehold.co/600x400/34495e/ffffff?text=LUTS', category: 'Assets' },
+                { id: 'prod_008', name: 'SaaS Landing Page HTML Template', description: 'A modern, responsive, and high-converting landing page template for your next software project.', price: 499, imageUrl: 'https://placehold.co/600x400/16a085/ffffff?text=SaaS+Template', category: 'Templates' },
+                { id: 'sub_001', name: 'Netflix Premium Plan', description: 'Ultra HD streaming on 4 devices. The best of movies and TV shows.', price: 799, imageUrl: 'https://placehold.co/600x400/e74c3c/ffffff?text=Netflix', category: 'Entertainment', billing: 'per month' },
+                { id: 'sub_002', name: 'Spotify Premium Family', description: 'Ad-free music for up to 6 family members. Offline downloads included.', price: 179, imageUrl: 'https://placehold.co/600x400/2ecc71/ffffff?text=Spotify', category: 'Music', billing: 'per month' },
+                { id: 'sub_003', name: 'Adobe Creative Cloud - All Apps', description: 'Get 20+ creative apps, including Photoshop, Illustrator, and Premiere Pro.', price: 4230, imageUrl: 'https://placehold.co/600x400/d35400/ffffff?text=Adobe+CC', category: 'Software', billing: 'per month' },
+                { id: 'sub_004', name: 'Canva Pro', description: 'Design anything. Publish anywhere. With premium features like Brand Kit, and more.', price: 499, imageUrl: 'https://placehold.co/600x400/8e44ad/ffffff?text=Canva+Pro', category: 'Productivity', billing: 'per month' },
+            ];
+            const batch = writeBatch(db);
+            const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
+            sampleProducts.forEach(product => batch.set(doc(productsCollection, product.id), product));
+            await batch.commit();
+        }
+        
+        function closeAllModals() { modalsContainer.innerHTML = ''; }
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        async function initializeAppAndFetchData() {
+            try {
+                // This logic is now simplified to only use anonymous sign-in,
+                // which is suitable for both local development and the intended environment.
+                await signInAnonymously(auth);
+                await fetchAndRenderProducts();
+            } catch (error) {
+                console.error("Authentication or data fetching failed:", error);
+                productsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error: Could not initialize app. ${error.message}</p>`;
+            }
+        }
+
+        // --- UI & Event Handlers ---
+        hamburgerBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        
+        document.body.addEventListener('click', async function(event) {
+            const target = event.target;
+            
+            if (target.closest('.add-to-cart-btn')) {
+                const productId = target.closest('[data-product-id]').dataset.productId;
+                addToCart(productId);
+            }
+            if (target.closest('#cart-icon-container')) {
+                openCartModal();
+            }
+            if (target.closest('.close-modal-btn')) {
+                closeAllModals();
+            }
+            if (target.closest('.cart-quantity-change')) {
+                const btn = target.closest('.cart-quantity-change');
+                changeCartQuantity(btn.dataset.productId, parseInt(btn.dataset.change, 10));
+            }
+            if (target.closest('.checkout-btn')) {
+                if(auth.currentUser && !auth.currentUser.isAnonymous) {
+                    alert('Proceeding to payment!');
+                } else {
+                    openAuthModal();
+                }
+            }
+            if (target.closest('.logout-btn')) {
+                await signOut(auth);
+            }
+            if (target.matches('.filter-btn')) {
+                if (categoryFiltersContainer.querySelector('.active')) {
+                    categoryFiltersContainer.querySelector('.active').classList.remove('active');
+                }
+                target.classList.add('active');
+                activeCategory = target.dataset.category;
+                renderProducts(searchBar.value, activeCategory);
+            }
+        });
+        
+        searchBar.addEventListener('input', (e) => renderProducts(e.target.value, activeCategory));
+
+        // --- Cart Functions ---
+        function addToCart(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            const existingItem = cart.find(item => item.product.id === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ product, quantity: 1 });
+            }
+            updateCartCount();
+        }
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.textContent = totalItems;
+        }
+        function changeCartQuantity(productId, change) {
+            const itemIndex = cart.findIndex(i => i.product.id === productId);
+            if (itemIndex > -1) {
+                cart[itemIndex].quantity += change;
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+            }
+            updateCartCount();
+            renderCartModal();
+        }
+
+        // --- Modal Functions ---
+        function openCartModal() {
+            closeAllModals();
+            const cartPanel = document.createElement('div');
+            cartPanel.id = 'cart-panel';
+            cartPanel.className = 'cart-panel cart-enter';
+            modalsContainer.appendChild(cartPanel);
+            
+            renderCartModal();
+            requestAnimationFrame(() => {
+                cartPanel.classList.add('cart-enter-active');
+            });
+        }
+        function renderCartModal() {
+            const cartPanel = document.getElementById('cart-panel');
+            if (!cartPanel) return;
+
+            const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+            let cartItemsHTML = cart.length === 0 ? `<div class="text-center text-gray-500 p-8">Your cart is empty.</div>` : cart.map(item => `
+                <div class="flex items-center justify-between p-4 border-b border-gray-700">
+                    <img src="${item.product.imageUrl}" alt="${item.product.name}" class="w-16 h-16 rounded-md object-cover mr-4">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-white">${item.product.name}</h4>
+                        <p class="text-sm text-gray-400">₹${item.product.price}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                       <button class="cart-quantity-change btn-secondary p-1 rounded-full w-6 h-6 flex items-center justify-center" data-product-id="${item.product.id}" data-change="-1">-</button>
+                       <span class="text-white">${item.quantity}</span>
+                       <button class="cart-quantity-change btn-secondary p-1 rounded-full w-6 h-6 flex items-center justify-center" data-product-id="${item.product.id}" data-change="1">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            cartPanel.innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-700"><h3 class="text-2xl font-bold text-white">Your Cart</h3><button class="close-modal-btn p-2 rounded-full text-2xl text-gray-400 hover:bg-gray-700">&times;</button></div>
+                    <div class="flex-grow overflow-y-auto">${cartItemsHTML}</div>
+                    <div class="p-6 border-t border-gray-700 bg-gray-800/50">
+                        <div class="flex justify-between items-center mb-4 text-xl font-bold text-white"><span>Subtotal</span><span>₹${total.toFixed(2)}</span></div>
+                        <button class="checkout-btn btn-primary w-full py-3">Checkout</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function openAuthModal() {
+            closeAllModals();
+            const modalHTML = `
+                <div id="auth-modal" class="modal-overlay">
+                    <div class="glass-card p-8 rounded-lg max-w-md w-full">
+                         <button class="close-modal-btn absolute top-4 right-4 text-3xl p-1 text-gray-400 hover:text-white">&times;</button>
+                         <div id="auth-tabs" class="flex border-b border-gray-700 mb-6">
+                            <button class="auth-tab active flex-1 py-2 font-bold" data-tab="login">Login</button>
+                            <button class="auth-tab flex-1 py-2 font-bold text-gray-500" data-tab="signup">Sign Up</button>
+                         </div>
+                         <div id="auth-content"></div>
+                    </div>
+                </div>
+            `;
+            modalsContainer.innerHTML = modalHTML;
+            showAuthTab('login');
+            modalsContainer.querySelector('#auth-tabs').addEventListener('click', (e) => {
+                if(e.target.matches('.auth-tab')) {
+                    modalsContainer.querySelector('.auth-tab.active').classList.remove('active', 'text-white');
+                    modalsContainer.querySelector('.auth-tab.active').classList.add('text-gray-500');
+                    e.target.classList.add('active', 'text-white');
+                    e.target.classList.remove('text-gray-500');
+                    showAuthTab(e.target.dataset.tab);
+                }
+            });
+        }
+        function showAuthTab(tabName) {
+            const authContent = document.getElementById('auth-content');
+            if (tabName === 'login') {
+                authContent.innerHTML = `
+                    <form id="login-form" class="space-y-4">
+                        <input type="email" id="login-email" placeholder="Email" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                        <input type="password" id="login-password" placeholder="Password" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                        <button type="submit" class="btn-primary w-full py-3">Login</button>
+                    </form>
+                `;
+                document.getElementById('login-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await signInWithEmailAndPassword(auth, e.target['login-email'].value, e.target['login-password'].value);
+                        closeAllModals();
+                    } catch (error) { alert(error.message); }
+                });
+            } else {
+                authContent.innerHTML = `
+                     <form id="signup-form" class="space-y-4">
+                        <input type="email" id="signup-email" placeholder="Email" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                        <input type="password" id="signup-password" placeholder="Password" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                        <button type="submit" class="btn-primary w-full py-3">Sign Up</button>
+                    </form>
+                `;
+                 document.getElementById('signup-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                       await createUserWithEmailAndPassword(auth, e.target['signup-email'].value, e.target['signup-password'].value);
+                       closeAllModals();
+                    } catch (error) { alert(error.message); }
+                });
+            }
+        }
+        function updateUserInfo(user) {
+            const loggedInHTML = `
+                <span class="text-gray-300 truncate max-w-[150px]">${user.email}</span>
+                <button class="logout-btn btn-secondary text-xs px-3 py-1">Logout</button>
+            `;
+            const loggedOutHTML = `
+                 <button class="login-btn btn-primary text-sm">Login</button>
+            `;
+            
+            if(user && !user.isAnonymous) {
+                userInfo.innerHTML = loggedInHTML;
+                mobileUserInfo.innerHTML = `<div class="text-center p-4">${loggedInHTML}</div>`;
+            } else {
+                userInfo.innerHTML = loggedOutHTML;
+                mobileUserInfo.innerHTML = `<div class="text-center p-4">${loggedOutHTML}</div>`;
+            }
+            // Re-add event listener since we are overwriting HTML
+            document.querySelector('.login-btn')?.addEventListener('click', openAuthModal);
+        }
+
+        // --- App Start ---
+        onAuthStateChanged(auth, (user) => {
+            updateUserInfo(user);
+            if (!user) {
+                // If user logs out, immediately sign them in anonymously
+                // so they can continue to view products.
+                signInAnonymously(auth).catch(err => console.error("Anonymous re-sign-in failed:", err));
+            }
+        });
+        
+        initializeAppAndFetchData();
+        setupScrollAnimations();
+
+    </script>
+</body>
+</html
