@@ -1,621 +1,801 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DigitalStore - Premium Digital Marketplace</title>
+    <title>VogueVerse - Modern & Stylish E-commerce</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter & Playfair Display -->
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Favicon Placeholder -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+    <!-- Lucide Icons CDN (Vanilla JS version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-primary': '#1a1a1a',
+                        'brand-secondary': '#f3f3f3',
+                        'brand-accent': '#4a90e2',
+                        'brand-accent-hover': '#357abd',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117;
-            color: #e6edf3;
+            background-color: #ffffff;
         }
-        h1, h2, h3, h4 {
-            font-family: 'Playfair Display', serif;
+        i[data-lucide] {
+            width: 24px;
+            height: 24px;
         }
-
-        /* Aurora Background Animation */
-        .aurora-hero {
-            position: relative;
-            overflow: hidden;
-            background-color: #0d1117;
+        .search-bar-container {
+            transition: all 0.3s ease-in-out;
         }
-        .aurora-hero::before, .aurora-hero::after {
+        .cart-panel {
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Hide buttons until auth is ready */
+        .auth-dependent {
+            display: none;
+        }
+        .placeholder-glow::before {
             content: '';
             position: absolute;
-            width: 1000px;
-            height: 1000px;
-            background-image: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0) 60%);
-            border-radius: 50%;
-            animation: aurora-glow 20s infinite linear;
-            z-index: 0;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: glow 1.5s infinite;
         }
-        .aurora-hero::before {
-            top: -50%;
-            left: -50%;
+        @keyframes glow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
-        .aurora-hero::after {
-            bottom: -50%;
-            right: -50%;
-            animation-delay: -10s;
-        }
-        @keyframes aurora-glow {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(100px, 80px) scale(1.2); }
-            50% { transform: translate(0, 160px) scale(0.8); }
-            75% { transform: translate(-100px, 80px) scale(1.2); }
-        }
-
-        /* Glassmorphism Card Style */
-        .glass-card {
-            background: rgba(31, 41, 55, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border-color: rgba(99, 102, 241, 0.5);
-        }
-        
-        .btn-primary {
-            @apply bg-indigo-500 text-white font-bold py-2 px-5 rounded-lg shadow-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed;
-        }
-        .btn-danger {
-            @apply bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-red-500 transition-all duration-300;
-        }
-        .btn-secondary {
-             @apply bg-gray-700 text-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-gray-500 transition-all duration-300;
-        }
-        .filter-btn {
-            @apply px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 rounded-full cursor-pointer hover:bg-indigo-500 hover:text-white transition-all;
-        }
-        .filter-btn.active {
-            @apply bg-indigo-600 text-white shadow-md;
-        }
-
-        .loader {
-            border: 4px solid #374151;
-            border-top: 4px solid #818cf8;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .modal-overlay { @apply fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50; }
-        .cart-panel { @apply fixed top-0 right-0 h-full w-full max-w-md bg-gray-900 shadow-2xl transform transition-transform duration-500 ease-in-out z-50; }
-        .cart-enter { transform: translateX(100%); }
-        .cart-enter-active { transform: translateX(0); }
-        .cart-leave-active { transform: translateX(100%); }
-
-        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-white text-brand-primary">
+
+    <!-- Announcement Bar -->
+    <div id="promotion-bar" class="bg-brand-primary text-white text-center py-2.5 text-sm font-medium">
+        Loading promotion...
+    </div>
 
     <!-- Header -->
-    <header class="bg-gray-900/70 backdrop-blur-lg shadow-lg sticky top-0 z-40">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div class="text-3xl font-extrabold text-white">
-                <a href="#">Digital<span class="text-indigo-400">Store</span></a>
-            </div>
-            <div id="nav-links" class="hidden md:flex items-center space-x-8 text-base font-medium">
-                <a href="#digital" class="text-gray-300 hover:text-indigo-400 transition-colors">Products</a>
-                <a href="#testimonials" class="text-gray-300 hover:text-indigo-400 transition-colors">Testimonials</a>
-                <a href="#contact" class="text-gray-300 hover:text-indigo-400 transition-colors">Contact</a>
-            </div>
-             <div class="flex items-center space-x-4">
-                <div id="user-info" class="hidden md:flex items-center space-x-2 text-sm"></div>
-                <div id="cart-icon-container" class="relative cursor-pointer group">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-300 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                    <span id="cart-count" class="absolute -top-2 -right-3 bg-indigo-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center border-2 border-gray-900">0</span>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20 relative">
+                <!-- Logo -->
+                <a href="#" class="text-2xl font-bold tracking-tight z-10">
+                    VogueVerse
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Home</a>
+                    <a href="#shop" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Shop</a>
+                    <a href="#new-arrivals" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">New Arrivals</a>
+                    <a href="#about" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">About</a>
+                    <a href="#contact" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Contact</a>
+                </nav>
+                
+                <!-- Animated Search Bar -->
+                <div id="search-bar-container" class="search-bar-container absolute right-0 flex items-center justify-end w-full h-full bg-white opacity-0 pointer-events-none -z-10">
+                    <input type="text" id="search-input" placeholder="Search for products..." class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
+                    <button id="close-search-btn" class="ml-2 text-gray-500 hover:text-brand-primary">
+                        <i data-lucide="x"></i>
+                    </button>
                 </div>
-                <button id="hamburger-btn" class="md:hidden text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+
+
+                <!-- Header Icons -->
+                <div id="header-icons" class="flex items-center space-x-5 z-10">
+                    <button id="search-btn" class="text-gray-500 hover:text-brand-accent">
+                        <i data-lucide="search"></i>
+                    </button>
+                    <button id="user-btn" class="text-gray-500 hover:text-brand-accent">
+                         <i data-lucide="user"></i>
+                    </button>
+                    <button id="cart-btn" class="relative text-gray-500 hover:text-brand-accent">
+                        <i data-lucide="shopping-cart"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-brand-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-brand-accent">
+                        <i data-lucide="menu"></i>
+                    </button>
+                </div>
             </div>
-        </nav>
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-900/90 py-4">
-             <a href="#digital" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Products</a>
-             <a href="#testimonials" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Testimonials</a>
-             <a href="#contact" class="block text-center text-gray-300 hover:text-indigo-400 py-2">Contact</a>
-             <div id="mobile-user-info" class="mt-4"></div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <nav class="flex flex-col p-4 space-y-4">
+                <a href="#home" class="text-gray-600 hover:text-brand-accent">Home</a>
+                <a href="#shop" class="text-gray-600 hover:text-brand-accent">Shop</a>
+                <a href="#new-arrivals" class="text-gray-600 hover:text-brand-accent">New Arrivals</a>
+                <a href="#about" class="text-gray-600 hover:text-brand-accent">About</a>
+                <a href="#contact" class="text-gray-600 hover:text-brand-accent">Contact</a>
+            </nav>
         </div>
     </header>
 
-    <main>
+    <main id="home">
         <!-- Hero Section -->
-        <section class="aurora-hero text-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center relative z-10">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight reveal">Unlock Your Digital Potential</h1>
-                <p class="text-lg md:text-xl text-indigo-200 mb-10 max-w-3xl mx-auto reveal" style="transition-delay: 100ms;">
-                    The world's most trusted marketplace for high-quality digital assets, courses, and premium subscriptions.
-                </p>
-                <a href="#digital" class="bg-white text-indigo-600 font-bold py-4 px-10 rounded-full hover:bg-indigo-100 transition-all duration-300 text-lg shadow-lg transform hover:scale-105 reveal" style="transition-delay: 200ms;">
-                    Start Exploring
+        <section id="hero-section" class="relative h-[60vh] md:h-[80vh] bg-cover bg-center text-white bg-gray-300">
+            <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+                <h1 id="hero-title" class="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight">Loading...</h1>
+                <p id="hero-subtitle" class="text-lg md:text-xl max-w-2xl mb-8">Please wait while we fetch the latest styles.</p>
+                <a href="#shop" class="bg-brand-accent hover:bg-brand-accent-hover text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 duration-300">
+                    Shop Now
                 </a>
             </div>
         </section>
 
-        <!-- "Featured In" Section -->
-        <section class="py-16 bg-gray-900">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h3 class="text-center text-sm font-bold text-gray-500 uppercase tracking-widest mb-8">Trusted By The World's Best</h3>
-                <div class="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-4 grayscale opacity-50 invert">
-                    <img src="https://placehold.co/120x40/000000/FFFFFF?text=Forbes" alt="Forbes Logo" class="h-6 md:h-7">
-                    <img src="https://placehold.co/140x40/000000/FFFFFF?text=TechCrunch" alt="TechCrunch Logo" class="h-6 md:h-7">
-                    <img src="https://placehold.co/150x40/000000/FFFFFF?text=TheVerge" alt="The Verge Logo" class="h-6 md:h-7">
-                    <img src="https://placehold.co/130x40/000000/FFFFFF?text=WIRED" alt="Wired Logo" class="h-6 md:h-7">
-                     <img src="https://placehold.co/160x40/000000/FFFFFF?text=Mashable" alt="Mashable Logo" class="h-6 md:h-7">
+        <!-- Featured Categories -->
+        <section id="shop" class="py-16 md:py-24 bg-brand-secondary">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+                <div id="category-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                    <p class="col-span-full text-center">Loading categories...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Sellers -->
+        <section id="new-arrivals" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">Our Best Sellers</h2>
+                <div id="product-grid" class="grid grid-cols-2 gap-4 md:gap-8">
+                    <p class="col-span-full text-center">Loading products...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sale Banner -->
+        <section class="bg-brand-primary text-white">
+            <div class="container mx-auto px-4 py-16 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-2">MID-SEASON SALE</h2>
+                <p class="text-lg md:text-xl mb-6">Up to 50% off on selected items. Don't miss out!</p>
+                <a href="#shop" class="bg-white text-brand-primary font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-200 transition-colors duration-300">
+                    Explore Deals
+                </a>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section id="about" class="py-16 md:py-24 bg-brand-secondary">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+                <div id="testimonial-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <p class="col-span-full text-center">Loading testimonials...</p>
                 </div>
             </div>
         </section>
         
-        <!-- Search and Filter Bar -->
-        <section id="digital" class="py-16 bg-gray-900/50 backdrop-blur-sm sticky top-[76px] z-30">
-             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row gap-6 items-center">
-                    <div class="relative flex-grow w-full">
-                        <input type="text" id="search-bar" placeholder="Search for products..." class="w-full p-4 pl-12 text-lg bg-gray-800 border-2 border-gray-700 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow text-white">
-                        <svg class="w-6 h-6 text-gray-400 absolute top-1/2 left-4 transform -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                    <div id="category-filters" class="flex flex-wrap justify-center gap-2">
-                        <!-- Filter buttons will be injected here -->
-                    </div>
-                </div>
-             </div>
-        </section>
-
-        <!-- Products Section -->
-        <section class="py-20">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <div class="loader-container col-span-full flex justify-center items-center h-64"><div class="loader"></div></div>
+        <!-- Newsletter Subscription -->
+        <section id="contact" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-2xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-4">Join Our Newsletter</h2>
+                    <p class="text-gray-600 mb-8">Subscribe to get the latest on sales, new releases and more.</p>
+                    <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4">
+                        <input type="email" id="newsletter-email" placeholder="Enter your email" class="flex-grow w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-accent" required>
+                        <button type="submit" class="bg-brand-primary text-white font-bold py-3 px-8 rounded-md hover:bg-gray-800 transition-colors duration-300">Subscribe</button>
+                    </form>
+                    <p id="newsletter-feedback" class="mt-4 text-green-600"></p>
                 </div>
             </div>
         </section>
 
-        <!-- Testimonials Section -->
-        <section id="testimonials" class="py-24 bg-gray-800/20">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl md:text-5xl font-bold text-center text-white mb-16 reveal">Why Creators & Consumers Love Us</h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="glass-card p-8 reveal">
-                        <img src="https://i.pravatar.cc/100?u=a" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
-                        <p class="text-gray-300 mb-6 text-lg">"This is the best platform for digital goods. The quality is unmatched and the support is fantastic. I found exactly what I needed for my project."</p>
-                        <h4 class="font-bold text-white text-xl">Sarah Johnson</h4>
-                        <p class="text-sm text-indigo-400">Freelance Designer</p>
-                    </div>
-                    <div class="glass-card p-8 reveal" style="transition-delay: 150ms;">
-                        <img src="https://i.pravatar.cc/100?u=b" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
-                        <p class="text-gray-300 mb-6 text-lg">"I've subscribed to multiple services through DigitalStore. It's so convenient to manage everything in one place. Highly recommended!"</p>
-                        <h4 class="font-bold text-white text-xl">Michael Chen</h4>
-                        <p class="text-sm text-indigo-400">Startup Founder</p>
-                    </div>
-                    <div class="glass-card p-8 reveal" style="transition-delay: 300ms;">
-                        <img src="https://i.pravatar.cc/100?u=c" alt="Customer" class="w-16 h-16 rounded-full mb-6 border-2 border-indigo-400">
-                        <p class="text-gray-300 mb-6 text-lg">"The courses are top-notch. I've learned more here than from any other online platform. A game-changer for my career."</p>
-                        <h4 class="font-bold text-white text-xl">Priya Patel</h4>
-                        <p class="text-sm text-indigo-400">Software Developer</p>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- Footer -->
-    <footer id="contact" class="bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-           <div class="grid md:grid-cols-4 gap-8 text-center md:text-left">
+    <footer class="bg-brand-primary text-white">
+        <div class="container mx-auto px-4 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <!-- About -->
                 <div>
-                    <h3 class="text-2xl font-extrabold text-white">Digital<span class="text-indigo-400">Store</span></h3>
-                    <p class="text-gray-400 mt-4">The premier marketplace for digital creators and consumers.</p>
+                    <h3 class="text-xl font-bold mb-4">VogueVerse</h3>
+                    <p class="text-gray-400">Your destination for modern, stylish, and high-quality fashion. We believe in expressing yourself through what you wear.</p>
                 </div>
+                <!-- Shop Links -->
                 <div>
-                    <h4 class="font-bold text-white mb-4">Products</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Courses</a></li>
-                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">eBooks</a></li>
-                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Software</a></li>
-                        <li><a href="#digital" class="text-gray-400 hover:text-indigo-400">Subscriptions</a></li>
+                    <h3 class="text-lg font-semibold mb-4">Shop</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#new-arrivals" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                        <li><a href="#shop" class="text-gray-400 hover:text-white">Best Sellers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Women's</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Men's</a></li>
                     </ul>
                 </div>
-                 <div>
-                    <h4 class="font-bold text-white mb-4">Company</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">About Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Careers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Press</a></li>
+                <!-- Customer Service -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#contact" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Track Order</a></li>
                     </ul>
                 </div>
-                 <div>
-                    <h4 class="font-bold text-white mb-4">Connect</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Twitter</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-indigo-400">Instagram</a></li>
-                    </ul>
+                <!-- Social Media -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
+                    <p class="text-gray-400 mb-4">Stay connected for the latest updates.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="twitter"></i></a>
+                    </div>
                 </div>
-           </div>
-           <div class="mt-12 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-                <p>&copy; 2025 flexdeal❤️. All Rights Reserved.</p>
-           </div>
+            </div>
+            <div class="border-t border-gray-700 mt-12 pt-8 text-center text-gray-500">
+                <p>&copy; 2024 VogueVerse. All Rights Reserved.</p>
+                <p id="user-id-display" class="text-xs mt-2"></p>
+            </div>
         </div>
     </footer>
 
-    <!-- Modals and Panels Container -->
-    <div id="modals-container"></div>
+    <!-- Shopping Cart Panel -->
+    <div id="cart-panel" class="cart-panel fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-lg z-50 transform translate-x-full">
+        <div class="flex items-center justify-between p-6 border-b">
+            <h2 class="text-2xl font-bold">Your Cart</h2>
+            <button id="close-cart-btn" class="text-gray-500 hover:text-brand-primary">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="p-6 overflow-y-auto h-[calc(100%-160px)]">
+            <p class="text-gray-500">Your cart is empty.</p>
+        </div>
+        <div class="p-6 border-t absolute bottom-0 w-full bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-semibold">Subtotal</span>
+                <span id="cart-subtotal" class="text-lg font-bold">₹0</span>
+            </div>
+            <button class="w-full bg-brand-accent text-white py-3 rounded-lg font-bold hover:bg-brand-accent-hover">Checkout</button>
+        </div>
+    </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, writeBatch, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD4LKIUCq68Rp81c9kN1WSDNAuEedad0Rk",
-            authDomain: "ecomerce-2dd80.firebaseapp.com",
-            projectId: "ecomerce-2dd80",
-            storageBucket: "ecomerce-2dd80.appspot.com",
-            messagingSenderId: "575144591727",
-            appId: "1:575144591727:web:3ee9fe793863506a44e89a"
-        };
-        
-        const appId = firebaseConfig.projectId;
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        let allProducts = [];
-        let cart = [];
-        let activeCategory = 'All';
-
-        const productsGrid = document.getElementById('products-grid');
-        const cartCountEl = document.getElementById('cart-count');
-        const modalsContainer = document.getElementById('modals-container');
-        const searchBar = document.getElementById('search-bar');
-        const categoryFiltersContainer = document.getElementById('category-filters');
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const userInfo = document.getElementById('user-info');
-        const mobileUserInfo = document.getElementById('mobile-user-info');
-
-        function renderProducts(filter = '', category = 'All') {
-            const searchTerm = filter.toLowerCase();
-            let filteredProducts = allProducts;
-
-            if (category !== 'All') {
-                filteredProducts = filteredProducts.filter(p => p.category === category);
-            }
-            if (searchTerm) {
-                filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-            }
-
-            const productsHTML = filteredProducts.map((p, i) => createProductCardHTML(p, i)).join('');
-            productsGrid.innerHTML = productsHTML || `<p class="col-span-full text-center text-gray-400 text-xl py-16">No products found matching your criteria.</p>`;
-            
-            setupScrollAnimations();
-        }
-        
-        function setupCategoryFilters() {
-            const categories = ['All', ...new Set(allProducts.map(p => p.category))];
-            categoryFiltersContainer.innerHTML = categories.map(cat => 
-                `<button class="filter-btn ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</button>`
-            ).join('');
-        }
-
-        function createProductCardHTML(product, index) {
-            const isSubscription = !!product.billing;
-            return `
-                <div class="glass-card flex flex-col reveal" style="transition-delay: ${ (index % 4) * 100}ms;">
-                    <div class="relative">
-                        <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-52 object-cover rounded-t-lg" onError="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Error';">
+    <!-- User Profile Modal -->
+    <div id="user-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="user-modal-title" class="text-2xl font-bold">My Account</h2>
+                <button id="close-user-modal-btn" class="text-gray-500 hover:text-brand-primary">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="auth-view">
+                <form id="user-form">
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="you@example.com" required>
                     </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <span class="text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">${product.category}</span>
-                        <h3 class="text-lg font-bold text-white mb-2 h-14">${product.name}</h3>
-                        <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">
-                            <p class="text-xl font-extrabold text-white">
-                                ₹${product.price}
-                                ${isSubscription ? `<span class="text-sm font-medium text-gray-400">/mo</span>` : ''}
-                            </p>
-                            <button data-product-id="${product.id}" class="add-to-cart-btn btn-primary text-sm">Add</button>
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="••••••••" required>
+                    </div>
+                    <div id="confirm-password-container" class="mb-6 hidden">
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="confirm-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="••••••••">
+                    </div>
+                    <p id="user-form-feedback" class="mb-4 text-sm text-center"></p>
+                    <button id="user-form-submit" type="submit" class="w-full bg-brand-primary text-white font-bold py-3 rounded-md hover:bg-gray-800 transition-colors duration-300">Sign In</button>
+                    <p id="user-form-toggle" class="text-center text-sm text-gray-600 mt-4">
+                        Don't have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign up</a>
+                    </p>
+                </form>
+            </div>
+            <div id="signed-in-view" class="hidden">
+                <p id="user-email-display" class="mb-4 text-center"></p>
+                <button id="sign-out-btn" class="w-full bg-red-500 text-white font-bold py-3 rounded-md hover:bg-red-600 transition-colors duration-300">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInAnonymously, 
+            signInWithCustomToken,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            setLogLevel, 
+            doc, 
+            getDoc,
+            setDoc,
+            collection, 
+            addDoc, 
+            getDocs,
+            onSnapshot,
+            deleteDoc,
+            writeBatch
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Initialization ---
+        const appId = 'default-app-id'; // Hardcoded to match user's database structure from screenshot
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgErP_g_ZqKraxqFAQi3W0YdwwkQdAZzg",
+            authDomain: "my-chat-app-a9b9e.firebaseapp.com",
+            projectId: "my-chat-app-a9b9e",
+            storageBucket: "my-chat-app-a9b9e.firebasestorage.app",
+            messagingSenderId: "292137527608",
+            appId: "1:292137527608:web:692b165effa77e79bf79cd"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        setLogLevel('debug'); 
+
+        let currentUserId = null;
+        let cartUnsubscribe = null;
+        let products = [];
+        let pendingProductId = null; // To hold product ID when a guest clicks "Add to Cart"
+
+        // --- UI Elements ---
+        const productGrid = document.getElementById('product-grid');
+        const categoryGrid = document.getElementById('category-grid');
+        const testimonialGrid = document.getElementById('testimonial-grid');
+        const heroTitle = document.getElementById('hero-title');
+        const heroSubtitle = document.getElementById('hero-subtitle');
+        const heroSection = document.getElementById('hero-section');
+        const promotionBar = document.getElementById('promotion-bar');
+        const cartCountEl = document.getElementById('cart-count');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartSubtotalEl = document.getElementById('cart-subtotal');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        // --- Data Seeding (for first-time setup) ---
+        async function seedInitialData() {
+            const setupDocRef = doc(db, 'artifacts', appId, 'setup', 'status');
+            try {
+                const setupDoc = await getDoc(setupDocRef);
+                if (setupDoc.exists() && setupDoc.data().isSeeded) {
+                    console.log("Initial data already seeded.");
+                    return;
+                }
+            } catch (error) {
+                 console.error("Could not check for seeded data, likely permissions. Assuming not seeded.", error);
+            }
+            
+            console.log("Attempting to seed initial data...");
+            const batch = writeBatch(db);
+
+            // Products
+            const initialProducts = [
+                { id: 'prod_1', name: 'Classic Denim Jacket', price: 6399, salePrice: 7999, image: 'https://placehold.co/400x500/fecaca/333333?text=Product+1', tag: 'SALE' },
+                { id: 'prod_2', name: 'Leather Crossbody Bag', price: 10320, image: 'https://placehold.co/400x500/c7d2fe/333333?text=Product+2' },
+                { id: 'prod_3', name: 'Minimalist White Sneakers', price: 7160, image: 'https://placehold.co/400x500/fed7aa/333333?text=Product+3', tag: 'NEW' },
+                { id: 'prod_4', name: 'Stylish Sunglasses', price: 3600, image: 'https://placehold.co/400x500/d1fae5/333333?text=Product+4' }
+            ];
+            initialProducts.forEach(p => {
+                const prodRef = doc(db, 'artifacts', appId, 'products', p.id);
+                batch.set(prodRef, p);
+            });
+
+            // Categories
+            const initialCategories = [
+                { name: 'Women', image: 'https://placehold.co/400x500/d1d5db/333333?text=Women' },
+                { name: 'Men', image: 'https://placehold.co/400x500/e5e7eb/333333?text=Men' },
+                { name: 'Kids', image: 'https://placehold.co/400x500/9ca3af/333333?text=Kids' },
+                { name: 'Accessories', image: 'https://placehold.co/400x500/bbf7d0/333333?text=Accessories' }
+            ];
+            initialCategories.forEach(c => {
+                const catRef = doc(collection(db, 'artifacts', appId, 'categories'));
+                batch.set(catRef, c);
+            });
+
+            // Testimonials
+            const initialTestimonials = [
+                { name: 'Jessica Miller', location: 'New York, NY', text: "Absolutely love the quality and style. My order arrived faster than expected. Will definitely shop here again!", image: 'https://placehold.co/100x100/f0f9ff/333333?text=User+1' },
+                { name: 'Alex Chen', location: 'San Francisco, CA', text: "The best online store for trendy clothes. The customer service was amazing when I had a question about sizing.", image: 'https://placehold.co/100x100/ecfdf5/333333?text=User+2' },
+                { name: 'Samantha Brown', location: 'Chicago, IL', text: "I'm so impressed with the variety. Found the perfect dress for a wedding. Great prices and beautiful products.", image: 'https://placehold.co/100x100/fefce8/333333?text=User+3' }
+            ];
+            initialTestimonials.forEach(t => {
+                const testRef = doc(collection(db, 'artifacts', appId, 'testimonials'));
+                batch.set(testRef, t);
+            });
+
+            // Site Content
+            const heroContentRef = doc(db, 'artifacts', appId, 'siteContent', 'hero');
+            batch.set(heroContentRef, {
+                title: 'Summer Styles are Here',
+                subtitle: 'Discover the latest trends and refresh your wardrobe with our stunning new collection.',
+                backgroundImage: 'https://placehold.co/1600x900/e2e8f0/333333?text=Summer+Collection'
+            });
+            const promoContentRef = doc(db, 'artifacts', appId, 'siteContent', 'promotionBar');
+            batch.set(promoContentRef, { text: 'Free Shipping On All Orders Over ₹3,999' });
+
+
+            // Mark as seeded
+            batch.set(setupDocRef, { isSeeded: true });
+
+            try {
+                await batch.commit();
+                console.log("Initial data seeding complete.");
+            } catch(error) {
+                console.error("Error committing seed data batch:", error);
+            }
+        }
+
+        // --- Data Fetching and Rendering ---
+        async function fetchAndRenderContent() {
+            try {
+                // Fetch Products
+                const productsCol = collection(db, 'artifacts', appId, 'products');
+                const productSnapshot = await getDocs(productsCol);
+                products = productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProducts(products);
+
+                // Fetch Categories
+                const categoriesCol = collection(db, 'artifacts', appId, 'categories');
+                const categorySnapshot = await getDocs(categoriesCol);
+                const categories = categorySnapshot.docs.map(doc => doc.data());
+                renderCategories(categories);
+
+                // Fetch Testimonials
+                const testimonialsCol = collection(db, 'artifacts', appId, 'testimonials');
+                const testimonialSnapshot = await getDocs(testimonialsCol);
+                const testimonials = testimonialSnapshot.docs.map(doc => doc.data());
+                renderTestimonials(testimonials);
+
+                // Fetch Site Content
+                const heroDocRef = doc(db, 'artifacts', appId, 'siteContent', 'hero');
+                const heroDoc = await getDoc(heroDocRef);
+                if (heroDoc.exists()) renderHero(heroDoc.data());
+
+                const promoDocRef = doc(db, 'artifacts', appId, 'siteContent', 'promotionBar');
+                const promoDoc = await getDoc(promoDocRef);
+                if (promoDoc.exists()) promotionBar.textContent = promoDoc.data().text;
+
+            } catch (error) {
+                console.error("Error fetching site content:", error);
+                productGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error loading products. Please check Firestore rules.</p>`;
+            }
+        }
+
+        function renderProducts(productsToRender) {
+            if (!productsToRender || productsToRender.length === 0) {
+                productGrid.innerHTML = '<p class="col-span-full text-center">No products found.</p>';
+                return;
+            }
+            productGrid.innerHTML = productsToRender.map(p => `
+                <div class="product-card group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                    <div class="relative overflow-hidden">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110">
+                        ${p.tag ? `<div class="absolute top-3 left-3 ${p.tag === 'SALE' ? 'bg-red-500' : 'bg-green-500'} text-white text-xs font-bold px-2 py-1 rounded">${p.tag}</div>` : ''}
+                        <div class="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex justify-center">
+                            <button class="add-to-cart-btn bg-brand-accent text-white py-2 px-4 rounded-lg font-semibold text-sm" data-product-id="${p.id}">Add to Cart</button>
                         </div>
                     </div>
-                </div>
-            `;
-        }
-        
-        async function fetchAndRenderProducts() {
-            try {
-                const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
-                const querySnapshot = await getDocs(productsCollection);
-
-                if (querySnapshot.empty) {
-                    await uploadInitialData();
-                    return fetchAndRenderProducts(); 
-                }
-
-                allProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                allProducts.sort((a, b) => a.name.localeCompare(b.name));
-                setupCategoryFilters();
-                renderProducts();
-
-            } catch (error) {
-                console.error("Error fetching products: ", error);
-                productsGrid.innerHTML = '<p class="col-span-full text-center text-red-500">Could not load products.</p>';
-            }
-        }
-        
-        async function uploadInitialData() {
-            const sampleProducts = [
-                { id: 'prod_001', name: 'The Complete 2025 Web Development Bootcamp', description: 'Become a Full-Stack Web Developer with just one course. HTML, CSS, Javascript, Node, React, MongoDB and more!', price: 899, imageUrl: 'https://placehold.co/600x400/3498db/ffffff?text=Web+Dev', category: 'Courses' },
-                { id: 'prod_002', name: 'UI/UX Design Masterclass: From Beginner to Pro', description: 'Learn to design beautiful and user-friendly interfaces with Figma. Includes 20+ real-world projects.', price: 749, imageUrl: 'https://placehold.co/600x400/9b59b6/ffffff?text=UI/UX+Design', category: 'Courses' },
-                { id: 'prod_003', name: 'Procreate for Beginners: Digital Illustration', description: 'Learn to draw and paint on your iPad with Procreate. No experience needed!', price: 499, imageUrl: 'https://placehold.co/600x400/e67e22/ffffff?text=Procreate', category: 'Courses' },
-                { id: 'prod_004', name: 'Notion Mastery: The Ultimate Productivity System', description: 'Organize your life and work with the all-in-one workspace, Notion. Includes templates.', price: 299, imageUrl: 'https://placehold.co/600x400/2c3e50/ffffff?text=Notion', category: 'Productivity' },
-                { id: 'prod_005', name: 'Atomic Habits: The eBook', description: 'An Easy & Proven Way to Build Good Habits & Break Bad Ones by James Clear.', price: 199, imageUrl: 'https://placehold.co/600x400/27ae60/ffffff?text=Atomic+Habits', category: 'eBooks' },
-                { id: 'prod_006', name: 'Minimalist Photography Presets for Lightroom', description: 'A collection of 50+ professional presets for Adobe Lightroom to give your photos a clean, modern look.', price: 149, imageUrl: 'https://placehold.co/600x400/f1c40f/ffffff?text=Presets', category: 'Assets' },
-                { id: 'prod_007', name: 'Pro Video-Editing LUTS Pack', description: 'Cinematic color grading LUTS for Premiere Pro, Final Cut Pro, and DaVinci Resolve.', price: 249, imageUrl: 'https://placehold.co/600x400/34495e/ffffff?text=LUTS', category: 'Assets' },
-                { id: 'prod_008', name: 'SaaS Landing Page HTML Template', description: 'A modern, responsive, and high-converting landing page template for your next software project.', price: 499, imageUrl: 'https://placehold.co/600x400/16a085/ffffff?text=SaaS+Template', category: 'Templates' },
-                { id: 'sub_001', name: 'Netflix Premium Plan', description: 'Ultra HD streaming on 4 devices. The best of movies and TV shows.', price: 799, imageUrl: 'https://placehold.co/600x400/e74c3c/ffffff?text=Netflix', category: 'Entertainment', billing: 'per month' },
-                { id: 'sub_002', name: 'Spotify Premium Family', description: 'Ad-free music for up to 6 family members. Offline downloads included.', price: 179, imageUrl: 'https://placehold.co/600x400/2ecc71/ffffff?text=Spotify', category: 'Music', billing: 'per month' },
-                { id: 'sub_003', name: 'Adobe Creative Cloud - All Apps', description: 'Get 20+ creative apps, including Photoshop, Illustrator, and Premiere Pro.', price: 4230, imageUrl: 'https://placehold.co/600x400/d35400/ffffff?text=Adobe+CC', category: 'Software', billing: 'per month' },
-                { id: 'sub_004', name: 'Canva Pro', description: 'Design anything. Publish anywhere. With premium features like Brand Kit, and more.', price: 499, imageUrl: 'https://placehold.co/600x400/8e44ad/ffffff?text=Canva+Pro', category: 'Productivity', billing: 'per month' },
-            ];
-            const batch = writeBatch(db);
-            const productsCollection = collection(db, `artifacts/${appId}/public/data/products`);
-            sampleProducts.forEach(product => batch.set(doc(productsCollection, product.id), product));
-            await batch.commit();
-        }
-        
-        function closeAllModals() { modalsContainer.innerHTML = ''; }
-        function setupScrollAnimations() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) entry.target.classList.add('visible');
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        }
-
-        async function initializeAppAndFetchData() {
-            try {
-                // This logic is now simplified to only use anonymous sign-in,
-                // which is suitable for both local development and the intended environment.
-                await signInAnonymously(auth);
-                await fetchAndRenderProducts();
-            } catch (error) {
-                console.error("Authentication or data fetching failed:", error);
-                productsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error: Could not initialize app. ${error.message}</p>`;
-            }
-        }
-
-        // --- UI & Event Handlers ---
-        hamburgerBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        
-        document.body.addEventListener('click', async function(event) {
-            const target = event.target;
-            
-            if (target.closest('.add-to-cart-btn')) {
-                const productId = target.closest('[data-product-id]').dataset.productId;
-                addToCart(productId);
-            }
-            if (target.closest('#cart-icon-container')) {
-                openCartModal();
-            }
-            if (target.closest('.close-modal-btn')) {
-                closeAllModals();
-            }
-            if (target.closest('.cart-quantity-change')) {
-                const btn = target.closest('.cart-quantity-change');
-                changeCartQuantity(btn.dataset.productId, parseInt(btn.dataset.change, 10));
-            }
-            if (target.closest('.checkout-btn')) {
-                if(auth.currentUser && !auth.currentUser.isAnonymous) {
-                    alert('Proceeding to payment!');
-                } else {
-                    openAuthModal();
-                }
-            }
-            if (target.closest('.logout-btn')) {
-                await signOut(auth);
-            }
-            if (target.matches('.filter-btn')) {
-                if (categoryFiltersContainer.querySelector('.active')) {
-                    categoryFiltersContainer.querySelector('.active').classList.remove('active');
-                }
-                target.classList.add('active');
-                activeCategory = target.dataset.category;
-                renderProducts(searchBar.value, activeCategory);
-            }
-        });
-        
-        searchBar.addEventListener('input', (e) => renderProducts(e.target.value, activeCategory));
-
-        // --- Cart Functions ---
-        function addToCart(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            const existingItem = cart.find(item => item.product.id === productId);
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                cart.push({ product, quantity: 1 });
-            }
-            updateCartCount();
-        }
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCountEl.textContent = totalItems;
-        }
-        function changeCartQuantity(productId, change) {
-            const itemIndex = cart.findIndex(i => i.product.id === productId);
-            if (itemIndex > -1) {
-                cart[itemIndex].quantity += change;
-                if (cart[itemIndex].quantity <= 0) {
-                    cart.splice(itemIndex, 1);
-                }
-            }
-            updateCartCount();
-            renderCartModal();
-        }
-
-        // --- Modal Functions ---
-        function openCartModal() {
-            closeAllModals();
-            const cartPanel = document.createElement('div');
-            cartPanel.id = 'cart-panel';
-            cartPanel.className = 'cart-panel cart-enter';
-            modalsContainer.appendChild(cartPanel);
-            
-            renderCartModal();
-            requestAnimationFrame(() => {
-                cartPanel.classList.add('cart-enter-active');
-            });
-        }
-        function renderCartModal() {
-            const cartPanel = document.getElementById('cart-panel');
-            if (!cartPanel) return;
-
-            const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-            let cartItemsHTML = cart.length === 0 ? `<div class="text-center text-gray-500 p-8">Your cart is empty.</div>` : cart.map(item => `
-                <div class="flex items-center justify-between p-4 border-b border-gray-700">
-                    <img src="${item.product.imageUrl}" alt="${item.product.name}" class="w-16 h-16 rounded-md object-cover mr-4">
-                    <div class="flex-grow">
-                        <h4 class="font-bold text-white">${item.product.name}</h4>
-                        <p class="text-sm text-gray-400">₹${item.product.price}</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                       <button class="cart-quantity-change btn-secondary p-1 rounded-full w-6 h-6 flex items-center justify-center" data-product-id="${item.product.id}" data-change="-1">-</button>
-                       <span class="text-white">${item.quantity}</span>
-                       <button class="cart-quantity-change btn-secondary p-1 rounded-full w-6 h-6 flex items-center justify-center" data-product-id="${item.product.id}" data-change="1">+</button>
+                    <div class="p-4 text-center">
+                        <h3 class="product-name text-lg font-semibold text-gray-800 mb-1">${p.name}</h3>
+                        <p class="text-brand-accent font-bold">₹${p.price.toLocaleString('en-IN')} ${p.salePrice ? `<span class="text-gray-500 line-through ml-2">₹${p.salePrice.toLocaleString('en-IN')}</span>` : ''}</p>
                     </div>
                 </div>
             `).join('');
-
-            cartPanel.innerHTML = `
-                <div class="flex flex-col h-full">
-                    <div class="flex justify-between items-center p-6 border-b border-gray-700"><h3 class="text-2xl font-bold text-white">Your Cart</h3><button class="close-modal-btn p-2 rounded-full text-2xl text-gray-400 hover:bg-gray-700">&times;</button></div>
-                    <div class="flex-grow overflow-y-auto">${cartItemsHTML}</div>
-                    <div class="p-6 border-t border-gray-700 bg-gray-800/50">
-                        <div class="flex justify-between items-center mb-4 text-xl font-bold text-white"><span>Subtotal</span><span>₹${total.toFixed(2)}</span></div>
-                        <button class="checkout-btn btn-primary w-full py-3">Checkout</button>
-                    </div>
-                </div>
-            `;
         }
         
-        function openAuthModal() {
-            closeAllModals();
-            const modalHTML = `
-                <div id="auth-modal" class="modal-overlay">
-                    <div class="glass-card p-8 rounded-lg max-w-md w-full">
-                         <button class="close-modal-btn absolute top-4 right-4 text-3xl p-1 text-gray-400 hover:text-white">&times;</button>
-                         <div id="auth-tabs" class="flex border-b border-gray-700 mb-6">
-                            <button class="auth-tab active flex-1 py-2 font-bold" data-tab="login">Login</button>
-                            <button class="auth-tab flex-1 py-2 font-bold text-gray-500" data-tab="signup">Sign Up</button>
-                         </div>
-                         <div id="auth-content"></div>
+        function renderCategories(categories) {
+            categoryGrid.innerHTML = categories.map(c => `
+                <a href="#" class="group relative overflow-hidden rounded-lg">
+                    <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                        <h3 class="text-white text-2xl font-bold">${c.name}</h3>
                     </div>
+                </a>
+            `).join('');
+        }
+        
+        function renderTestimonials(testimonials) {
+            testimonialGrid.innerHTML = testimonials.map(t => `
+                <div class="bg-white p-8 rounded-lg shadow-md text-center">
+                    <img src="${t.image}" class="w-20 h-20 rounded-full mx-auto mb-4" alt="${t.name}">
+                    <p class="text-gray-600 mb-4">"${t.text}"</p>
+                    <h4 class="font-bold text-lg">${t.name}</h4>
+                    <p class="text-sm text-gray-500">${t.location}</p>
                 </div>
-            `;
-            modalsContainer.innerHTML = modalHTML;
-            showAuthTab('login');
-            modalsContainer.querySelector('#auth-tabs').addEventListener('click', (e) => {
-                if(e.target.matches('.auth-tab')) {
-                    modalsContainer.querySelector('.auth-tab.active').classList.remove('active', 'text-white');
-                    modalsContainer.querySelector('.auth-tab.active').classList.add('text-gray-500');
-                    e.target.classList.add('active', 'text-white');
-                    e.target.classList.remove('text-gray-500');
-                    showAuthTab(e.target.dataset.tab);
-                }
-            });
-        }
-        function showAuthTab(tabName) {
-            const authContent = document.getElementById('auth-content');
-            if (tabName === 'login') {
-                authContent.innerHTML = `
-                    <form id="login-form" class="space-y-4">
-                        <input type="email" id="login-email" placeholder="Email" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
-                        <input type="password" id="login-password" placeholder="Password" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
-                        <button type="submit" class="btn-primary w-full py-3">Login</button>
-                    </form>
-                `;
-                document.getElementById('login-form').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await signInWithEmailAndPassword(auth, e.target['login-email'].value, e.target['login-password'].value);
-                        closeAllModals();
-                    } catch (error) { alert(error.message); }
-                });
-            } else {
-                authContent.innerHTML = `
-                     <form id="signup-form" class="space-y-4">
-                        <input type="email" id="signup-email" placeholder="Email" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
-                        <input type="password" id="signup-password" placeholder="Password" required class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white">
-                        <button type="submit" class="btn-primary w-full py-3">Sign Up</button>
-                    </form>
-                `;
-                 document.getElementById('signup-form').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    try {
-                       await createUserWithEmailAndPassword(auth, e.target['signup-email'].value, e.target['signup-password'].value);
-                       closeAllModals();
-                    } catch (error) { alert(error.message); }
-                });
-            }
-        }
-        function updateUserInfo(user) {
-            const loggedInHTML = `
-                <span class="text-gray-300 truncate max-w-[150px]">${user.email}</span>
-                <button class="logout-btn btn-secondary text-xs px-3 py-1">Logout</button>
-            `;
-            const loggedOutHTML = `
-                 <button class="login-btn btn-primary text-sm">Login</button>
-            `;
-            
-            if(user && !user.isAnonymous) {
-                userInfo.innerHTML = loggedInHTML;
-                mobileUserInfo.innerHTML = `<div class="text-center p-4">${loggedInHTML}</div>`;
-            } else {
-                userInfo.innerHTML = loggedOutHTML;
-                mobileUserInfo.innerHTML = `<div class="text-center p-4">${loggedOutHTML}</div>`;
-            }
-            // Re-add event listener since we are overwriting HTML
-            document.querySelector('.login-btn')?.addEventListener('click', openAuthModal);
+            `).join('');
         }
 
-        // --- App Start ---
-        onAuthStateChanged(auth, (user) => {
-            updateUserInfo(user);
-            if (!user) {
-                // If user logs out, immediately sign them in anonymously
-                // so they can continue to view products.
-                signInAnonymously(auth).catch(err => console.error("Anonymous re-sign-in failed:", err));
+        function renderHero(heroData) {
+            heroTitle.textContent = heroData.title;
+            heroSubtitle.textContent = heroData.subtitle;
+            heroSection.style.backgroundImage = `url('${heroData.backgroundImage}')`;
+        }
+
+
+        // --- Firebase Auth Listener ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("User is signed in:", user.uid);
+                currentUserId = user.uid;
+                userIdDisplay.textContent = `User ID: ${currentUserId}`;
+                
+                document.getElementById('auth-view').classList.add('hidden');
+                document.getElementById('signed-in-view').classList.remove('hidden');
+                document.getElementById('user-email-display').textContent = user.isAnonymous ? 'Signed in as Guest' : `Signed in as ${user.email}`;
+                document.querySelectorAll('.auth-dependent').forEach(el => el.style.display = 'inline-flex');
+                listenToCart();
+
+                if (pendingProductId) {
+                    await addToCart(pendingProductId);
+                    pendingProductId = null;
+                }
+
+            } else {
+                console.log("User is signed out.");
+                currentUserId = null;
+                userIdDisplay.textContent = 'Not signed in.';
+                if (cartUnsubscribe) cartUnsubscribe();
+                
+                document.getElementById('auth-view').classList.remove('hidden');
+                document.getElementById('signed-in-view').classList.add('hidden');
+                document.querySelectorAll('.auth-dependent').forEach(el => el.style.display = 'none');
+                updateCartUI([]);
             }
         });
-        
-        initializeAppAndFetchData();
-        setupScrollAnimations();
 
+        // --- Firestore Cart Logic ---
+        function getCartCollectionRef() {
+            if (!currentUserId) return null;
+            return collection(db, 'artifacts', appId, 'users', currentUserId, 'cart');
+        }
+
+        function listenToCart() {
+            const cartCol = getCartCollectionRef();
+            if (!cartCol) return;
+            cartUnsubscribe = onSnapshot(cartCol, (snapshot) => {
+                const cartItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateCartUI(cartItems);
+            });
+        }
+
+        function updateCartUI(cartItems) {
+            cartCountEl.textContent = cartItems.length;
+            if (cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-gray-500">Your cart is empty.</p>';
+            } else {
+                cartItemsContainer.innerHTML = cartItems.map(item => `
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-sm text-gray-500">₹${item.price.toLocaleString('en-IN')}</p>
+                        </div>
+                        <button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-item-id="${item.id}">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+            const subtotal = cartItems.reduce((total, item) => total + item.price, 0);
+            cartSubtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+        }
+
+        async function addToCart(productId) {
+            if (!currentUserId) {
+                pendingProductId = productId;
+                openUserModal();
+                return;
+            }
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                try {
+                    const cartCol = getCartCollectionRef();
+                    await addDoc(cartCol, {
+                        productId: product.id,
+                        name: product.name,
+                        price: product.price,
+                        addedAt: new Date()
+                    });
+                    document.getElementById('cart-panel').classList.remove('translate-x-full');
+                } catch (error) {
+                    console.error("Error adding to cart: ", error);
+                }
+            }
+        }
+
+        async function removeFromCart(itemId) {
+            if (!currentUserId) return;
+            try {
+                const itemDocRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'cart', itemId);
+                await deleteDoc(itemDocRef);
+            } catch (error) {
+                console.error("Error removing from cart: ", error);
+            }
+        }
+        
+        const openUserModal = () => document.getElementById('user-modal').classList.remove('opacity-0', 'pointer-events-none');
+        const closeUserModal = () => document.getElementById('user-modal').classList.add('opacity-0', 'pointer-events-none');
+
+        // --- DOM Event Listeners ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            await fetchAndRenderContent(); // Fetch public data on load
+            
+            // Attempt to sign in silently
+             try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    // We don't sign in anonymously by default anymore
+                }
+            } catch (error) {
+                console.error("Initial sign-in error:", error);
+            }
+            
+            // --- UI Elements (re-queried after render) ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const searchBtn = document.getElementById('search-btn');
+            const closeSearchBtn = document.getElementById('close-search-btn');
+            const searchInput = document.getElementById('search-input');
+            const searchBarContainer = document.getElementById('search-bar-container');
+            const headerIcons = document.getElementById('header-icons');
+            const cartBtn = document.getElementById('cart-btn');
+            const closeCartBtn = document.getElementById('close-cart-btn');
+            const userBtn = document.getElementById('user-btn');
+            const userModal = document.getElementById('user-modal');
+            const closeUserModalBtn = document.getElementById('close-user-modal-btn');
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterEmail = document.getElementById('newsletter-email');
+            const newsletterFeedback = document.getElementById('newsletter-feedback');
+            const userModalTitle = document.getElementById('user-modal-title');
+            const userForm = document.getElementById('user-form');
+            const userFormSubmit = document.getElementById('user-form-submit');
+            const userFormToggle = document.getElementById('user-form-toggle');
+            const confirmPasswordContainer = document.getElementById('confirm-password-container');
+            const userFormFeedback = document.getElementById('user-form-feedback');
+            const signOutBtn = document.getElementById('sign-out-btn');
+            let isSignUp = false;
+
+            // --- Event Handlers ---
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            searchBtn.addEventListener('click', () => {
+                searchBarContainer.classList.remove('opacity-0', 'pointer-events-none', '-z-10');
+                searchBarContainer.classList.add('z-20');
+                headerIcons.classList.add('opacity-0', 'pointer-events-none');
+                searchInput.focus();
+            });
+            closeSearchBtn.addEventListener('click', () => {
+                searchBarContainer.classList.add('opacity-0', 'pointer-events-none', '-z-10');
+                searchBarContainer.classList.remove('z-20');
+                headerIcons.classList.remove('opacity-0', 'pointer-events-none');
+                searchInput.value = '';
+                renderProducts(products);
+            });
+            searchInput.addEventListener('keyup', () => {
+                 const searchTerm = searchInput.value.toLowerCase();
+                 const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+                 renderProducts(filteredProducts);
+            });
+
+            cartBtn.addEventListener('click', () => {
+                if(!currentUserId) {
+                    openUserModal();
+                } else {
+                    document.getElementById('cart-panel').classList.remove('translate-x-full');
+                }
+            });
+            closeCartBtn.addEventListener('click', () => document.getElementById('cart-panel').classList.add('translate-x-full'));
+            
+            productGrid.addEventListener('click', (e) => {
+                const button = e.target.closest('.add-to-cart-btn');
+                if (button) addToCart(button.dataset.productId);
+            });
+
+            cartItemsContainer.addEventListener('click', (e) => {
+                const removeButton = e.target.closest('.remove-from-cart-btn');
+                if (removeButton) {
+                    removeFromCart(removeButton.dataset.itemId);
+                }
+            });
+
+            userBtn.addEventListener('click', openUserModal);
+            closeUserModalBtn.addEventListener('click', closeUserModal);
+            userModal.addEventListener('click', (e) => { if (e.target === userModal) closeUserModal(); });
+
+            signOutBtn.addEventListener('click', () => {
+                signOut(auth).catch(error => console.error("Sign out error", error));
+                closeUserModal();
+            });
+
+            userFormToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                isSignUp = !isSignUp;
+                userForm.reset();
+                userFormFeedback.textContent = '';
+                if (isSignUp) {
+                    userModalTitle.textContent = 'Create Account';
+                    userFormSubmit.textContent = 'Sign Up';
+                    confirmPasswordContainer.classList.remove('hidden');
+                    document.getElementById('confirm-password').required = true;
+                    userFormToggle.innerHTML = `Already have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign in</a>`;
+                } else {
+                    userModalTitle.textContent = 'My Account';
+                    userFormSubmit.textContent = 'Sign In';
+                    confirmPasswordContainer.classList.add('hidden');
+                    document.getElementById('confirm-password').required = false;
+                    userFormToggle.innerHTML = `Don't have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign up</a>`;
+                }
+            });
+
+            userForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                userFormFeedback.classList.remove('text-red-600', 'text-green-600');
+                userFormFeedback.textContent = '';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    if (isSignUp) {
+                        const confirmPassword = document.getElementById('confirm-password').value;
+                        if (password !== confirmPassword) throw new Error('Passwords do not match.');
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        userFormFeedback.textContent = 'Account created successfully!';
+                    } else {
+                        await signInWithEmailAndPassword(auth, email, password);
+                        userFormFeedback.textContent = 'Signed in successfully!';
+                    }
+                    userFormFeedback.classList.add('text-green-600');
+                    setTimeout(closeUserModal, 1500);
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    userFormFeedback.textContent = error.message;
+                    userFormFeedback.classList.add('text-red-600');
+                }
+            });
+
+            newsletterForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId) {
+                    openUserModal();
+                    newsletterFeedback.textContent = 'Please sign in to subscribe.';
+                    setTimeout(() => newsletterFeedback.textContent = '', 3000);
+                    return;
+                }
+                try {
+                    const newsletterCol = collection(db, 'artifacts', appId, 'newsletterSubscriptions');
+                    await addDoc(newsletterCol, { email: newsletterEmail.value, subscribedAt: new Date() });
+                    newsletterFeedback.textContent = `Thank you! ${newsletterEmail.value} has been subscribed.`;
+                    newsletterEmail.value = '';
+                    setTimeout(() => newsletterFeedback.textContent = '', 5000);
+                } catch (error) {
+                    console.error("Error subscribing to newsletter: ", error);
+                    newsletterFeedback.textContent = 'Subscription failed. Please try again.';
+                }
+            });
+        });
     </script>
 </body>
-</html
+</html>
