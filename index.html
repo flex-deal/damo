@@ -3,800 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VogueVerse - Modern & Stylish E-commerce</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <title>Payment Successful!</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons CDN (Vanilla JS version) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        'brand-primary': '#1a1a1a',
-                        'brand-secondary': '#f3f3f3',
-                        'brand-accent': '#4a90e2',
-                        'brand-accent-hover': '#357abd',
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
+        /* Use Inter font family */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
-        }
-        i[data-lucide] {
-            width: 24px;
-            height: 24px;
-        }
-        .search-bar-container {
-            transition: all 0.3s ease-in-out;
-        }
-        .cart-panel {
-            transition: transform 0.3s ease-in-out;
-        }
-        .modal-overlay {
-            transition: opacity 0.3s ease-in-out;
-        }
-        /* Hide buttons until auth is ready */
-        .auth-dependent {
-            display: none;
-        }
-        .placeholder-glow::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            animation: glow 1.5s infinite;
-        }
-        @keyframes glow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
     </style>
 </head>
-<body class="bg-white text-brand-primary">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
 
-    <!-- Announcement Bar -->
-    <div id="promotion-bar" class="bg-brand-primary text-white text-center py-2.5 text-sm font-medium">
-        Loading promotion...
+    <!-- Main container card -->
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-lg max-w-md w-full text-center border border-gray-200">
+        
+        <!-- Success Icon -->
+        <div class="mx-auto bg-green-100 rounded-full h-20 w-20 flex items-center justify-center mb-6">
+            <svg class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+
+        <!-- Main Message -->
+        <h1 class="text-3xl font-bold text-gray-800 mb-3">Payment Successful!</h1>
+        <p class="text-gray-600 mb-6">Thank you for your purchase. Your order is confirmed.</p>
+
+        <!-- Order ID Section -->
+        <div class="bg-gray-100 rounded-lg p-4 mb-8">
+            <p class="text-sm text-gray-500">Your Order ID</p>
+            <p id="orderId" class="text-2xl font-semibold text-gray-900 tracking-wider"></p>
+        </div>
+        
+        <!-- Redirecting Message -->
+        <div class="redirecting text-gray-500">
+            <p>We're preparing your order details.</p>
+            <p>Redirecting to WhatsApp in <span id="countdown" class="font-bold text-gray-700">5</span> seconds...</p>
+        </div>
+
     </div>
 
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-20 relative">
-                <!-- Logo -->
-                <a href="#" class="text-2xl font-bold tracking-tight z-10">
-                    VogueVerse
-                </a>
+    <script>
+        // --- CONFIGURATION ---
+        // Replace with your WhatsApp number (include country code, no "+")
+        const phoneNumber = '918942865606'; 
+        const redirectTimeout = 5; // seconds
 
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Home</a>
-                    <a href="#shop" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Shop</a>
-                    <a href="#new-arrivals" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">New Arrivals</a>
-                    <a href="chatbot.html" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">chat bot</a>
-                    <a href="contect.html" class="text-gray-600 hover:text-brand-accent transition-colors duration-300 font-medium">Contact</a>
-                 
-                </nav>
-                
-                <!-- Animated Search Bar -->
-                <div id="search-bar-container" class="search-bar-container absolute right-0 flex items-center justify-end w-full h-full bg-white opacity-0 pointer-events-none -z-10">
-                    <input type="text" id="search-input" placeholder="Search for products..." class="w-full max-w-sm px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent">
-                    <button id="close-search-btn" class="ml-2 text-gray-500 hover:text-brand-primary">
-                        <i data-lucide="x"></i>
-                    </button>
-                </div>
+        // --- SCRIPT LOGIC ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements from the DOM
+            const orderIdElement = document.getElementById('orderId');
+            const countdownElement = document.getElementById('countdown');
 
+            // Generate a random 6-digit order ID
+            const orderId = Math.floor(100000 + Math.random() * 900000);
 
-                <!-- Header Icons -->
-                <div id="header-icons" class="flex items-center space-x-5 z-10">
-                    <button id="search-btn" class="text-gray-500 hover:text-brand-accent">
-                        <i data-lucide="search"></i>
-                    </button>
-                    <button id="user-btn" class="text-gray-500 hover:text-brand-accent">
-                         <i data-lucide="user"></i>
-                    </button>
-                    <button id="cart-btn" class="relative text-gray-500 hover:text-brand-accent">
-                        <i data-lucide="shopping-cart"></i>
-                        <span id="cart-count" class="absolute -top-2 -right-2 bg-brand-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
-                    </button>
-                    <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-brand-accent">
-                        <i data-lucide="menu"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
-            <nav class="flex flex-col p-4 space-y-4">
-                <a href="#home" class="text-gray-600 hover:text-brand-accent">Home</a>
-                <a href="#shop" class="text-gray-600 hover:text-brand-accent">Shop</a>
-                <a href="#" class="text-gray-600 hover:text-brand-accent">About</a>
-                <a href="chatbot.html" class="text-gray-600 hover:text-brand-accent">chat bot</a>
-                <a href="#contact" class="text-gray-600 hover:text-brand-accent">Contact</a>
-            </nav>
-        </div>
-    </header>
-
-    <main id="home">
-        <!-- Hero Section -->
-        <section id="hero-section" class="relative h-[60vh] md:h-[80vh] bg-cover bg-center text-white bg-gray-300">
-            <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-            <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-                <h1 id="hero-title" class="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight">Loading...</h1>
-                <p id="hero-subtitle" class="text-lg md:text-xl max-w-2xl mb-8">Please wait while we fetch the latest styles.</p>
-                <a href="#shop" class="bg-brand-accent hover:bg-brand-accent-hover text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 duration-300">
-                    Shop Now
-                </a>
-            </div>
-        </section>
-
-        <!-- Featured Categories -->
-        <section id="shop" class="py-16 md:py-24 bg-brand-secondary">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12">Shop by Category</h2>
-                <div id="category-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                    <p class="col-span-full text-center">Loading categories...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Best Sellers -->
-        <section id="new-arrivals" class="py-16 md:py-24 bg-white">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12">Our Best Sellers</h2>
-                <div id="product-grid" class="grid grid-cols-2 gap-4 md:gap-8">
-                    <p class="col-span-full text-center">Loading products...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sale Banner -->
-        <section class="bg-brand-primary text-white">
-            <div class="container mx-auto px-4 py-16 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold mb-2">MID-SEASON SALE</h2>
-                <p class="text-lg md:text-xl mb-6">Up to 50% off on selected items. Don't miss out!</p>
-                <a href="#shop" class="bg-white text-brand-primary font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-200 transition-colors duration-300">
-                    Explore Deals
-                </a>
-            </div>
-        </section>
-
-        <!-- Testimonials -->
-        <section id="about" class="py-16 md:py-24 bg-brand-secondary">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
-                <div id="testimonial-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <p class="col-span-full text-center">Loading testimonials...</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Newsletter Subscription -->
-        <section id="contact" class="py-16 bg-white">
-            <div class="container mx-auto px-4">
-                <div class="max-w-2xl mx-auto text-center">
-                    <h2 class="text-3xl font-bold mb-4">Join Our Newsletter</h2>
-                    <p class="text-gray-600 mb-8">Subscribe to get the latest on sales, new releases and more.</p>
-                    <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4">
-                        <input type="email" id="newsletter-email" placeholder="Enter your email" class="flex-grow w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-accent" required>
-                        <button type="submit" class="bg-brand-primary text-white font-bold py-3 px-8 rounded-md hover:bg-gray-800 transition-colors duration-300">Subscribe</button>
-                    </form>
-                    <p id="newsletter-feedback" class="mt-4 text-green-600"></p>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-brand-primary text-white">
-        <div class="container mx-auto px-4 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                <!-- About -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4">VogueVerse</h3>
-                    <p class="text-gray-400">Your destination for modern, stylish, and high-quality fashion. We believe in expressing yourself through what you wear.</p>
-                </div>
-                <!-- Shop Links -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Shop</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#new-arrivals" class="text-gray-400 hover:text-white">New Arrivals</a></li>
-                        <li><a href="#shop" class="text-gray-400 hover:text-white">Best Sellers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Women's</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Men's</a></li>
-                    </ul>
-                </div>
-                <!-- Customer Service -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
-                    <ul class="space-y-3">
-                        <li><a href="#contact" class="text-gray-400 hover:text-white">Contact Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Track Order</a></li>
-                    </ul>
-                </div>
-                <!-- Social Media -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
-                    <p class="text-gray-400 mb-4">Stay connected for the latest updates.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i data-lucide="twitter"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-12 pt-8 text-center text-gray-500">
-                <p>&copy; 2024 VogueVerse. All Rights Reserved.</p>
-                <p id="user-id-display" class="text-xs mt-2"></p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Shopping Cart Panel -->
-    <div id="cart-panel" class="cart-panel fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-lg z-50 transform translate-x-full">
-        <div class="flex items-center justify-between p-6 border-b">
-            <h2 class="text-2xl font-bold">Your Cart</h2>
-            <button id="close-cart-btn" class="text-gray-500 hover:text-brand-primary">
-                <i data-lucide="x"></i>
-            </button>
-        </div>
-        <div id="cart-items" class="p-6 overflow-y-auto h-[calc(100%-160px)]">
-            <p class="text-gray-500">Your cart is empty.</p>
-        </div>
-        <div class="p-6 border-t absolute bottom-0 w-full bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-lg font-semibold">Subtotal</span>
-                <span id="cart-subtotal" class="text-lg font-bold">₹0</span>
-            </div>
-            <button class="w-full bg-brand-accent text-white py-3 rounded-lg font-bold hover:bg-brand-accent-hover">Checkout</button>
-        </div>
-    </div>
-
-    <!-- User Profile Modal -->
-    <div id="user-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="user-modal-title" class="text-2xl font-bold">My Account</h2>
-                <button id="close-user-modal-btn" class="text-gray-500 hover:text-brand-primary">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <div id="auth-view">
-                <form id="user-form">
-                    <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="you@example.com" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="••••••••" required>
-                    </div>
-                    <div id="confirm-password-container" class="mb-6 hidden">
-                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                        <input type="password" id="confirm-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-accent" placeholder="••••••••">
-                    </div>
-                    <p id="user-form-feedback" class="mb-4 text-sm text-center"></p>
-                    <button id="user-form-submit" type="submit" class="w-full bg-brand-primary text-white font-bold py-3 rounded-md hover:bg-gray-800 transition-colors duration-300">Sign In</button>
-                    <p id="user-form-toggle" class="text-center text-sm text-gray-600 mt-4">
-                        Don't have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign up</a>
-                    </p>
-                </form>
-            </div>
-            <div id="signed-in-view" class="hidden">
-                <p id="user-email-display" class="mb-4 text-center"></p>
-                <button id="sign-out-btn" class="w-full bg-red-500 text-white font-bold py-3 rounded-md hover:bg-red-600 transition-colors duration-300">Sign Out</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import Firebase functions
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signInAnonymously, 
-            signInWithCustomToken,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            setLogLevel, 
-            doc, 
-            getDoc,
-            setDoc,
-            collection, 
-            addDoc, 
-            getDocs,
-            onSnapshot,
-            deleteDoc,
-            writeBatch
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Firebase Initialization ---
-        const appId = 'default-app-id'; // Hardcoded to match user's database structure from screenshot
-        const firebaseConfig = {
-            apiKey: "AIzaSyBgErP_g_ZqKraxqFAQi3W0YdwwkQdAZzg",
-            authDomain: "my-chat-app-a9b9e.firebaseapp.com",
-            projectId: "my-chat-app-a9b9e",
-            storageBucket: "my-chat-app-a9b9e.firebasestorage.app",
-            messagingSenderId: "292137527608",
-            appId: "1:292137527608:web:692b165effa77e79bf79cd"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        setLogLevel('debug'); 
-
-        let currentUserId = null;
-        let cartUnsubscribe = null;
-        let products = [];
-        let pendingProductId = null; // To hold product ID when a guest clicks "Add to Cart"
-
-        // --- UI Elements ---
-        const productGrid = document.getElementById('product-grid');
-        const categoryGrid = document.getElementById('category-grid');
-        const testimonialGrid = document.getElementById('testimonial-grid');
-        const heroTitle = document.getElementById('hero-title');
-        const heroSubtitle = document.getElementById('hero-subtitle');
-        const heroSection = document.getElementById('hero-section');
-        const promotionBar = document.getElementById('promotion-bar');
-        const cartCountEl = document.getElementById('cart-count');
-        const cartItemsContainer = document.getElementById('cart-items');
-        const cartSubtotalEl = document.getElementById('cart-subtotal');
-        const userIdDisplay = document.getElementById('user-id-display');
-
-        // --- Data Seeding (for first-time setup) ---
-        async function seedInitialData() {
-            const setupDocRef = doc(db, 'artifacts', appId, 'setup', 'status');
-            try {
-                const setupDoc = await getDoc(setupDocRef);
-                if (setupDoc.exists() && setupDoc.data().isSeeded) {
-                    console.log("Initial data already seeded.");
-                    return;
-                }
-            } catch (error) {
-                 console.error("Could not check for seeded data, likely permissions. Assuming not seeded.", error);
+            // Display the Order ID
+            if (orderIdElement) {
+                orderIdElement.innerText = `#${orderId}`;
             }
-            
-            console.log("Attempting to seed initial data...");
-            const batch = writeBatch(db);
 
-            // Products
-            const initialProducts = [
-                { id: 'prod_1', name: 'Classic Denim Jacket', price: 6399, salePrice: 7999, image: 'https://placehold.co/400x500/fecaca/333333?text=Product+1', tag: 'SALE' },
-                { id: 'prod_2', name: 'Leather Crossbody Bag', price: 10320, image: 'https://placehold.co/400x500/c7d2fe/333333?text=Product+2' },
-                { id: 'prod_3', name: 'Minimalist White Sneakers', price: 7160, image: 'https://placehold.co/400x500/fed7aa/333333?text=Product+3', tag: 'NEW' },
-                { id: 'prod_4', name: 'Stylish Sunglasses', price: 3600, image: 'https://placehold.co/400x500/d1fae5/333333?text=Product+4' }
-            ];
-            initialProducts.forEach(p => {
-                const prodRef = doc(db, 'artifacts', appId, 'products', p.id);
-                batch.set(prodRef, p);
-            });
+            // Create the pre-filled WhatsApp message
+            const message = `Hi, my payment was successful. My Order ID is: #${orderId}`;
 
-            // Categories
-            const initialCategories = [
-                { name: 'Women', image: 'https://placehold.co/400x500/d1d5db/333333?text=Women' },
-                { name: 'Men', image: 'https://placehold.co/400x500/e5e7eb/333333?text=Men' },
-                { name: 'Kids', image: 'https://placehold.co/400x500/9ca3af/333333?text=Kids' },
-                { name: 'Accessories', image: 'https://placehold.co/400x500/bbf7d0/333333?text=Accessories' }
-            ];
-            initialCategories.forEach(c => {
-                const catRef = doc(collection(db, 'artifacts', appId, 'categories'));
-                batch.set(catRef, c);
-            });
+            // Construct the WhatsApp redirect URL
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-            // Testimonials
-            const initialTestimonials = [
-                { name: 'Jessica Miller', location: 'New York, NY', text: "Absolutely love the quality and style. My order arrived faster than expected. Will definitely shop here again!", image: 'https://placehold.co/100x100/f0f9ff/333333?text=User+1' },
-                { name: 'Alex Chen', location: 'San Francisco, CA', text: "The best online store for trendy clothes. The customer service was amazing when I had a question about sizing.", image: 'https://placehold.co/100x100/ecfdf5/333333?text=User+2' },
-                { name: 'Samantha Brown', location: 'Chicago, IL', text: "I'm so impressed with the variety. Found the perfect dress for a wedding. Great prices and beautiful products.", image: 'https://placehold.co/100x100/fefce8/333333?text=User+3' }
-            ];
-            initialTestimonials.forEach(t => {
-                const testRef = doc(collection(db, 'artifacts', appId, 'testimonials'));
-                batch.set(testRef, t);
-            });
-
-            // Site Content
-            const heroContentRef = doc(db, 'artifacts', appId, 'siteContent', 'hero');
-            batch.set(heroContentRef, {
-                title: 'Summer Styles are Here',
-                subtitle: 'Discover the latest trends and refresh your wardrobe with our stunning new collection.',
-                backgroundImage: 'https://placehold.co/1600x900/e2e8f0/333333?text=Summer+Collection'
-            });
-            const promoContentRef = doc(db, 'artifacts', appId, 'siteContent', 'promotionBar');
-            batch.set(promoContentRef, { text: 'Free Shipping On All Orders Over ₹3,999' });
-
-
-            // Mark as seeded
-            batch.set(setupDocRef, { isSeeded: true });
-
-            try {
-                await batch.commit();
-                console.log("Initial data seeding complete.");
-            } catch(error) {
-                console.error("Error committing seed data batch:", error);
-            }
-        }
-
-        // --- Data Fetching and Rendering ---
-        async function fetchAndRenderContent() {
-            try {
-                // Fetch Products
-                const productsCol = collection(db, 'artifacts', appId, 'products');
-                const productSnapshot = await getDocs(productsCol);
-                products = productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderProducts(products);
-
-                // Fetch Categories
-                const categoriesCol = collection(db, 'artifacts', appId, 'categories');
-                const categorySnapshot = await getDocs(categoriesCol);
-                const categories = categorySnapshot.docs.map(doc => doc.data());
-                renderCategories(categories);
-
-                // Fetch Testimonials
-                const testimonialsCol = collection(db, 'artifacts', appId, 'testimonials');
-                const testimonialSnapshot = await getDocs(testimonialsCol);
-                const testimonials = testimonialSnapshot.docs.map(doc => doc.data());
-                renderTestimonials(testimonials);
-
-                // Fetch Site Content
-                const heroDocRef = doc(db, 'artifacts', appId, 'siteContent', 'hero');
-                const heroDoc = await getDoc(heroDocRef);
-                if (heroDoc.exists()) renderHero(heroDoc.data());
-
-                const promoDocRef = doc(db, 'artifacts', appId, 'siteContent', 'promotionBar');
-                const promoDoc = await getDoc(promoDocRef);
-                if (promoDoc.exists()) promotionBar.textContent = promoDoc.data().text;
-
-            } catch (error) {
-                console.error("Error fetching site content:", error);
-                productGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error loading products. Please check Firestore rules.</p>`;
-            }
-        }
-
-        function renderProducts(productsToRender) {
-            if (!productsToRender || productsToRender.length === 0) {
-                productGrid.innerHTML = '<p class="col-span-full text-center">No products found.</p>';
-                return;
-            }
-            productGrid.innerHTML = productsToRender.map(p => `
-                <div class="product-card group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                    <div class="relative overflow-hidden">
-                        <img src="${p.image}" alt="${p.name}" class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110">
-                        ${p.tag ? `<div class="absolute top-3 left-3 ${p.tag === 'SALE' ? 'bg-red-500' : 'bg-green-500'} text-white text-xs font-bold px-2 py-1 rounded">${p.tag}</div>` : ''}
-                        <div class="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex justify-center">
-                            <button class="add-to-cart-btn bg-brand-accent text-white py-2 px-4 rounded-lg font-semibold text-sm" data-product-id="${p.id}">Add to Cart</button>
-                        </div>
-                    </div>
-                    <div class="p-4 text-center">
-                        <h3 class="product-name text-lg font-semibold text-gray-800 mb-1">${p.name}</h3>
-                        <p class="text-brand-accent font-bold">₹${p.price.toLocaleString('en-IN')} ${p.salePrice ? `<span class="text-gray-500 line-through ml-2">₹${p.salePrice.toLocaleString('en-IN')}</span>` : ''}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function renderCategories(categories) {
-            categoryGrid.innerHTML = categories.map(c => `
-                <a href="#" class="group relative overflow-hidden rounded-lg">
-                    <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                        <h3 class="text-white text-2xl font-bold">${c.name}</h3>
-                    </div>
-                </a>
-            `).join('');
-        }
-        
-        function renderTestimonials(testimonials) {
-            testimonialGrid.innerHTML = testimonials.map(t => `
-                <div class="bg-white p-8 rounded-lg shadow-md text-center">
-                    <img src="${t.image}" class="w-20 h-20 rounded-full mx-auto mb-4" alt="${t.name}">
-                    <p class="text-gray-600 mb-4">"${t.text}"</p>
-                    <h4 class="font-bold text-lg">${t.name}</h4>
-                    <p class="text-sm text-gray-500">${t.location}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderHero(heroData) {
-            heroTitle.textContent = heroData.title;
-            heroSubtitle.textContent = heroData.subtitle;
-            heroSection.style.backgroundImage = `url('${heroData.backgroundImage}')`;
-        }
-
-
-        // --- Firebase Auth Listener ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log("User is signed in:", user.uid);
-                currentUserId = user.uid;
-                userIdDisplay.textContent = `User ID: ${currentUserId}`;
-                
-                document.getElementById('auth-view').classList.add('hidden');
-                document.getElementById('signed-in-view').classList.remove('hidden');
-                document.getElementById('user-email-display').textContent = user.isAnonymous ? 'Signed in as Guest' : `Signed in as ${user.email}`;
-                document.querySelectorAll('.auth-dependent').forEach(el => el.style.display = 'inline-flex');
-                listenToCart();
-
-                if (pendingProductId) {
-                    await addToCart(pendingProductId);
-                    pendingProductId = null;
-                }
-
-            } else {
-                console.log("User is signed out.");
-                currentUserId = null;
-                userIdDisplay.textContent = 'Not signed in.';
-                if (cartUnsubscribe) cartUnsubscribe();
-                
-                document.getElementById('auth-view').classList.remove('hidden');
-                document.getElementById('signed-in-view').classList.add('hidden');
-                document.querySelectorAll('.auth-dependent').forEach(el => el.style.display = 'none');
-                updateCartUI([]);
-            }
-        });
-
-        // --- Firestore Cart Logic ---
-        function getCartCollectionRef() {
-            if (!currentUserId) return null;
-            return collection(db, 'artifacts', appId, 'users', currentUserId, 'cart');
-        }
-
-        function listenToCart() {
-            const cartCol = getCartCollectionRef();
-            if (!cartCol) return;
-            cartUnsubscribe = onSnapshot(cartCol, (snapshot) => {
-                const cartItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateCartUI(cartItems);
-            });
-        }
-
-        function updateCartUI(cartItems) {
-            cartCountEl.textContent = cartItems.length;
-            if (cartItems.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-gray-500">Your cart is empty.</p>';
-            } else {
-                cartItemsContainer.innerHTML = cartItems.map(item => `
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h4 class="font-semibold">${item.name}</h4>
-                            <p class="text-sm text-gray-500">₹${item.price.toLocaleString('en-IN')}</p>
-                        </div>
-                        <button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-item-id="${item.id}">
-                            <i data-lucide="trash-2" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            }
-            const subtotal = cartItems.reduce((total, item) => total + item.price, 0);
-            cartSubtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
-        }
-
-        async function addToCart(productId) {
-            if (!currentUserId) {
-                pendingProductId = productId;
-                openUserModal();
-                return;
-            }
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                try {
-                    const cartCol = getCartCollectionRef();
-                    await addDoc(cartCol, {
-                        productId: product.id,
-                        name: product.name,
-                        price: product.price,
-                        addedAt: new Date()
-                    });
-                    document.getElementById('cart-panel').classList.remove('translate-x-full');
-                } catch (error) {
-                    console.error("Error adding to cart: ", error);
-                }
-            }
-        }
-
-        async function removeFromCart(itemId) {
-            if (!currentUserId) return;
-            try {
-                const itemDocRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'cart', itemId);
-                await deleteDoc(itemDocRef);
-            } catch (error) {
-                console.error("Error removing from cart: ", error);
-            }
-        }
-        
-        const openUserModal = () => document.getElementById('user-modal').classList.remove('opacity-0', 'pointer-events-none');
-        const closeUserModal = () => document.getElementById('user-modal').classList.add('opacity-0', 'pointer-events-none');
-
-        // --- DOM Event Listeners ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            lucide.createIcons();
-            await fetchAndRenderContent(); // Fetch public data on load
-            
-            // Attempt to sign in silently
-             try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // We don't sign in anonymously by default anymore
-                }
-            } catch (error) {
-                console.error("Initial sign-in error:", error);
-            }
-            
-            // --- UI Elements (re-queried after render) ---
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const searchBtn = document.getElementById('search-btn');
-            const closeSearchBtn = document.getElementById('close-search-btn');
-            const searchInput = document.getElementById('search-input');
-            const searchBarContainer = document.getElementById('search-bar-container');
-            const headerIcons = document.getElementById('header-icons');
-            const cartBtn = document.getElementById('cart-btn');
-            const closeCartBtn = document.getElementById('close-cart-btn');
-            const userBtn = document.getElementById('user-btn');
-            const userModal = document.getElementById('user-modal');
-            const closeUserModalBtn = document.getElementById('close-user-modal-btn');
-            const newsletterForm = document.getElementById('newsletter-form');
-            const newsletterEmail = document.getElementById('newsletter-email');
-            const newsletterFeedback = document.getElementById('newsletter-feedback');
-            const userModalTitle = document.getElementById('user-modal-title');
-            const userForm = document.getElementById('user-form');
-            const userFormSubmit = document.getElementById('user-form-submit');
-            const userFormToggle = document.getElementById('user-form-toggle');
-            const confirmPasswordContainer = document.getElementById('confirm-password-container');
-            const userFormFeedback = document.getElementById('user-form-feedback');
-            const signOutBtn = document.getElementById('sign-out-btn');
-            let isSignUp = false;
-
-            // --- Event Handlers ---
-            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-            
-            searchBtn.addEventListener('click', () => {
-                searchBarContainer.classList.remove('opacity-0', 'pointer-events-none', '-z-10');
-                searchBarContainer.classList.add('z-20');
-                headerIcons.classList.add('opacity-0', 'pointer-events-none');
-                searchInput.focus();
-            });
-            closeSearchBtn.addEventListener('click', () => {
-                searchBarContainer.classList.add('opacity-0', 'pointer-events-none', '-z-10');
-                searchBarContainer.classList.remove('z-20');
-                headerIcons.classList.remove('opacity-0', 'pointer-events-none');
-                searchInput.value = '';
-                renderProducts(products);
-            });
-            searchInput.addEventListener('keyup', () => {
-                 const searchTerm = searchInput.value.toLowerCase();
-                 const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm));
-                 renderProducts(filteredProducts);
-            });
-
-            cartBtn.addEventListener('click', () => {
-                if(!currentUserId) {
-                    openUserModal();
-                } else {
-                    document.getElementById('cart-panel').classList.remove('translate-x-full');
-                }
-            });
-            closeCartBtn.addEventListener('click', () => document.getElementById('cart-panel').classList.add('translate-x-full'));
-            
-            productGrid.addEventListener('click', (e) => {
-                const button = e.target.closest('.add-to-cart-btn');
-                if (button) addToCart(button.dataset.productId);
-            });
-
-            cartItemsContainer.addEventListener('click', (e) => {
-                const removeButton = e.target.closest('.remove-from-cart-btn');
-                if (removeButton) {
-                    removeFromCart(removeButton.dataset.itemId);
-                }
-            });
-
-            userBtn.addEventListener('click', openUserModal);
-            closeUserModalBtn.addEventListener('click', closeUserModal);
-            userModal.addEventListener('click', (e) => { if (e.target === userModal) closeUserModal(); });
-
-            signOutBtn.addEventListener('click', () => {
-                signOut(auth).catch(error => console.error("Sign out error", error));
-                closeUserModal();
-            });
-
-            userFormToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                isSignUp = !isSignUp;
-                userForm.reset();
-                userFormFeedback.textContent = '';
-                if (isSignUp) {
-                    userModalTitle.textContent = 'Create Account';
-                    userFormSubmit.textContent = 'Sign Up';
-                    confirmPasswordContainer.classList.remove('hidden');
-                    document.getElementById('confirm-password').required = true;
-                    userFormToggle.innerHTML = `Already have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign in</a>`;
-                } else {
-                    userModalTitle.textContent = 'My Account';
-                    userFormSubmit.textContent = 'Sign In';
-                    confirmPasswordContainer.classList.add('hidden');
-                    document.getElementById('confirm-password').required = false;
-                    userFormToggle.innerHTML = `Don't have an account? <a href="#" class="font-medium text-brand-accent hover:underline">Sign up</a>`;
-                }
-            });
-
-            userForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                userFormFeedback.classList.remove('text-red-600', 'text-green-600');
-                userFormFeedback.textContent = '';
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                try {
-                    if (isSignUp) {
-                        const confirmPassword = document.getElementById('confirm-password').value;
-                        if (password !== confirmPassword) throw new Error('Passwords do not match.');
-                        await createUserWithEmailAndPassword(auth, email, password);
-                        userFormFeedback.textContent = 'Account created successfully!';
-                    } else {
-                        await signInWithEmailAndPassword(auth, email, password);
-                        userFormFeedback.textContent = 'Signed in successfully!';
+            // Start the countdown timer
+            let secondsLeft = redirectTimeout;
+            if (countdownElement) {
+                countdownElement.innerText = secondsLeft;
+                const interval = setInterval(() => {
+                    secondsLeft--;
+                    if (countdownElement) {
+                       countdownElement.innerText = secondsLeft;
                     }
-                    userFormFeedback.classList.add('text-green-600');
-                    setTimeout(closeUserModal, 1500);
-                } catch (error) {
-                    console.error("Auth error:", error);
-                    userFormFeedback.textContent = error.message;
-                    userFormFeedback.classList.add('text-red-600');
-                }
-            });
+                    if (secondsLeft <= 0) {
+                        clearInterval(interval);
+                        // Redirect to WhatsApp
+                        window.location.href = whatsappURL;
+                    }
+                }, 1000);
+            }
 
-            newsletterForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!currentUserId) {
-                    openUserModal();
-                    newsletterFeedback.textContent = 'Please sign in to subscribe.';
-                    setTimeout(() => newsletterFeedback.textContent = '', 3000);
-                    return;
-                }
-                try {
-                    const newsletterCol = collection(db, 'artifacts', appId, 'newsletterSubscriptions');
-                    await addDoc(newsletterCol, { email: newsletterEmail.value, subscribedAt: new Date() });
-                    newsletterFeedback.textContent = `Thank you! ${newsletterEmail.value} has been subscribed.`;
-                    newsletterEmail.value = '';
-                    setTimeout(() => newsletterFeedback.textContent = '', 5000);
-                } catch (error) {
-                    console.error("Error subscribing to newsletter: ", error);
-                    newsletterFeedback.textContent = 'Subscription failed. Please try again.';
-                }
-            });
+            // Fallback redirect in case the interval fails
+            setTimeout(() => {
+                window.location.href = whatsappURL;
+            }, redirectTimeout * 1000);
         });
     </script>
+
 </body>
 </html>
