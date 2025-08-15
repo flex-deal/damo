@@ -3,99 +3,1319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful!</title>
-    <!-- Tailwind CSS for styling -->
+    <title>ToyTopia - Your World of Fun!</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
+    
+    <!-- Google Fonts: Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons for modern icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <style>
-        /* Use Inter font family */
+        /* Custom font for the website */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Nunito', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(20px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+        .toast-animation { animation: fadeInOut 3s ease-in-out forwards; }
+
+        /* Hero pattern background */
+        .hero-pattern {
+            background-color: #7dd3fc;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0V5h6zm10 0h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6v-1h9v-9H6V5zm10 0h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9V5zm10 0h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9V5zm10 0h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9V5zm10 0h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9V5zm10 0h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9v-9h-9v-1h9V5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Button click animation */
+        .btn-click-effect:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease-in-out;
+        }
+        
+        /* Modal transition */
+        .modal-enter { opacity: 0; transform: scale(0.9); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.3s ease-out; }
+        .modal-leave-active { opacity: 0; transform: scale(0.9); transition: all 0.2s ease-in; }
+
+        .search-bar-enter { transform: translateY(-100%); }
+        .search-bar-enter-active { transform: translateY(0); transition: transform 0.3s ease-out; }
+        .search-bar-leave-active { transform: translateY(-100%); transition: transform 0.3s ease-in; }
+        
+        /* Prevent button from changing size during content swap */
+        .add-to-cart-btn {
+            min-width: 105px;
+            text-align: center;
+        }
+        
+        /* Product Modal Styles */
+        .modal-tab.active {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            font-weight: 700;
+        }
+        .thumbnail.active {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 2px #0ea5e9;
+        }
+        .star-rating svg, .review-form-stars .star-wrapper svg {
+            color: #d1d5db; /* gray-300 */
+        }
+        .star-rating svg.filled, .review-form-stars .star-wrapper.filled svg {
+            color: #f59e0b; /* amber-500 */
+            fill: #f59e0b;
+        }
+        #related-products-grid {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #related-products-grid::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .form-input.invalid {
+            border-color: #ef4444; /* red-500 */
+            box-shadow: 0 0 0 2px #fecaca; /* red-200 */
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100">
 
-    <!-- Main container card -->
-    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-lg max-w-md w-full text-center border border-gray-200">
+    <!-- Header Section -->
+    <header class="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-40 border-b border-gray-200">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-3xl font-black text-sky-500 flex items-center tracking-tighter">
+                    <i data-feather="box" class="text-amber-400"></i>
+                    <span class="ml-2">ToyTopia</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-8 font-bold text-gray-600">
+                    <a href="#" class="nav-link hover:text-pink-500 transition-colors duration-300">Home</a>
+                    <a href="#shop" class="nav-link hover:text-pink-500 transition-colors duration-300">Shop</a>
+                    <a href="#new-arrivals" class="nav-link hover:text-pink-500 transition-colors duration-300">New Arrivals</a>
+                    <a href="#contact" class="nav-link hover:text-pink-500 transition-colors duration-300">Contact</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="search-btn" class="text-gray-500 hover:text-sky-500"><i data-feather="search"></i></button>
+                    <button id="cart-button" class="text-gray-500 hover:text-sky-500 relative">
+                        <i data-feather="shopping-cart"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold hidden">0</span>
+                    </button>
+                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-sky-500"><i data-feather="menu"></i></button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
+                <a href="#" class="nav-link block py-2 px-4 text-sm font-semibold text-gray-700 hover:bg-sky-100 rounded-lg">Home</a>
+                <a href="#shop" class="nav-link block py-2 px-4 text-sm font-semibold text-gray-700 hover:bg-sky-100 rounded-lg">Shop</a>
+                <a href="#new-arrivals" class="nav-link block py-2 px-4 text-sm font-semibold text-gray-700 hover:bg-sky-100 rounded-lg">New Arrivals</a>
+                <a href="#contact" class="nav-link block py-2 px-4 text-sm font-semibold text-gray-700 hover:bg-sky-100 rounded-lg">Contact</a>
+            </div>
+        </nav>
+        <!-- Search Bar -->
+        <div id="search-bar" class="hidden bg-white border-b p-4 absolute w-full search-bar-enter">
+            <div class="container mx-auto flex">
+                <input type="text" placeholder="Search for toys..." class="w-full px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <button class="bg-sky-500 text-white px-6 rounded-r-lg hover:bg-sky-600"><i data-feather="search"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hero-pattern text-white overflow-hidden">
+            <div class="container mx-auto px-6 py-24 lg:py-40 text-center flex flex-col items-center">
+                <h1 id="hero-title" class="text-5xl md:text-7xl font-black leading-tight mb-4 drop-shadow-lg fade-in tracking-tighter">Unleash Imagination</h1>
+                <p id="hero-subtitle" class="text-lg md:text-xl mb-8 max-w-2xl mx-auto drop-shadow fade-in fade-in-delay-1">Discover a world of wonder with our curated collection of toys for every age and adventure.</p>
+                <a href="#shop" class="bg-pink-500 text-white font-bold py-4 px-10 rounded-full hover:bg-pink-600 transition duration-300 transform hover:scale-105 shadow-xl fade-in fade-in-delay-2 btn-click-effect">Shop Bestsellers</a>
+            </div>
+        </section>
+
+        <!-- Shop by Category Section -->
+        <section id="category-section" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-extrabold text-center text-gray-800 mb-12">Shop by Category</h2>
+                <div id="category-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <!-- Categories will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products Section -->
+        <section id="shop" class="py-20 bg-sky-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-extrabold text-center text-gray-800 mb-12">Our Featured Toys</h2>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Product Cards will be injected here by JS -->
+                </div>
+            </div>
+        </section>
         
-        <!-- Success Icon -->
-        <div class="mx-auto bg-green-100 rounded-full h-20 w-20 flex items-center justify-center mb-6">
-            <svg class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
+        <!-- Testimonials Section -->
+        <section class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-extrabold text-center text-gray-800 mb-12">What Our Customers Say</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-gray-50 p-8 rounded-xl">
+                        <p class="text-gray-600 mb-4">"An amazing collection of toys! My kids absolutely love the dragon plushie. The quality is fantastic and delivery was super fast."</p>
+                        <p class="font-bold text-gray-800">- Priya S.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl">
+                        <p class="text-gray-600 mb-4">"The RoboBuilder kit is a huge hit! It's educational and so much fun. A great way to introduce kids to STEM concepts."</p>
+                        <p class="font-bold text-gray-800">- Amit K.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl">
+                        <p class="text-gray-600 mb-4">"I'm so impressed with the quality of the wooden blocks. They are safe, durable, and beautifully made. Highly recommend this store!"</p>
+                        <p class="font-bold text-gray-800">- Sunita P.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        <!-- Main Message -->
-        <h1 class="text-3xl font-bold text-gray-800 mb-3">Payment Successful!</h1>
-        <p class="text-gray-600 mb-6">Thank you for your purchase. Your order is confirmed.</p>
-
-        <!-- Order ID Section -->
-        <div class="bg-gray-100 rounded-lg p-4 mb-8">
-            <p class="text-sm text-gray-500">Your Order ID</p>
-            <p id="orderId" class="text-2xl font-semibold text-gray-900 tracking-wider"></p>
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-black mb-4 text-sky-400 tracking-tighter">ToyTopia</h3>
+                    <p class="text-gray-400">Bringing joy and creativity to children everywhere.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Home</a></li>
+                        <li><a href="#shop" class="hover:text-white transition">Shop</a></li>
+                        <li><a href="#contact" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" id="admin-link" class="hover:text-white transition">Admin Panel</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact Us</h3>
+                    <p id="footer-email" class="text-gray-400">Email: support@toytopia.com</p>
+                    <p id="footer-phone" class="text-gray-400">Phone: +91 12345 67890</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" id="facebook-link" class="text-gray-400 hover:text-white transition"><i data-feather="facebook"></i></a>
+                        <a href="#" id="instagram-link" class="text-gray-400 hover:text-white transition"><i data-feather="instagram"></i></a>
+                        <a href="#" id="twitter-link" class="text-gray-400 hover:text-white transition"><i data-feather="twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
+                &copy; 2025 ToyTopia. All Rights Reserved.
+            </div>
         </div>
-        
-        <!-- Redirecting Message -->
-        <div class="redirecting text-gray-500">
-            <p>We're preparing your order details.</p>
-            <p>Redirecting to WhatsApp in <span id="countdown" class="font-bold text-gray-700">5</span> seconds...</p>
-        </div>
+    </footer>
 
+    <!-- Add to Cart Notification -->
+    <div id="cart-toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-xl opacity-0 font-semibold flex items-center space-x-2 z-50">
+        <i data-feather="check-circle" class="w-5 h-5"></i>
+        <span>Item added to cart!</span>
     </div>
 
-    <script>
-        // --- CONFIGURATION ---
-        // Replace with your WhatsApp number (include country code, no "+")
-        const phoneNumber = '918942865606'; 
-        const redirectTimeout = 5; // seconds
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-start hidden p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl mx-auto my-8 modal-enter">
+            <div class="p-6 relative">
+                <button id="close-product-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 z-10"><i data-feather="x" class="w-8 h-8"></i></button>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Image Gallery -->
+                    <div>
+                        <img id="modal-main-image" src="" alt="Product Image" class="w-full h-auto object-cover rounded-lg mb-4 aspect-square">
+                        <div id="modal-thumbnails" class="grid grid-cols-5 gap-2">
+                            <!-- Thumbnails injected here -->
+                        </div>
+                    </div>
+                    <!-- Product Details -->
+                    <div class="flex flex-col">
+                        <h2 id="modal-product-name" class="text-3xl lg:text-4xl font-black text-gray-800 mb-2"></h2>
+                        <p id="modal-product-category" class="text-gray-500 mb-4"></p>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div id="modal-avg-rating" class="star-rating flex"></div>
+                            <span id="modal-review-count" class="text-sm text-gray-500"></span>
+                        </div>
+                        <span id="modal-product-price" class="text-3xl lg:text-4xl font-extrabold text-sky-600 mb-6"></span>
+                        
+                        <!-- Offer Banner -->
+                        <div id="modal-offer-banner" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg mb-6">
+                            <p class="font-bold" id="modal-offer-title"></p>
+                            <p id="modal-offer-description"></p>
+                        </div>
+                        
+                        <button data-product-id="" class="add-to-cart-btn w-full bg-teal-500 text-white px-6 py-4 rounded-full hover:bg-teal-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg font-bold btn-click-effect text-lg">
+                            <span class="btn-add-state flex items-center space-x-2">
+                                <i data-feather="shopping-bag" class="w-6 h-6"></i>
+                                <span class="btn-text">Add to Cart</span>
+                            </span>
+                            <span class="btn-added-state hidden items-center space-x-2">
+                                <i data-feather="check" class="w-6 h-6"></i>
+                                <span class="btn-text">Added!</span>
+                            </span>
+                        </button>
+                        
+                        <!-- Tabs -->
+                        <div class="mt-8 border-t pt-6">
+                            <div class="flex border-b mb-4">
+                                <button data-tab="description" class="modal-tab py-2 px-4 border-b-2 border-transparent transition-colors duration-300">Description</button>
+                                <button data-tab="specs" class="modal-tab py-2 px-4 border-b-2 border-transparent transition-colors duration-300">Specifications</button>
+                                <button data-tab="reviews" class="modal-tab py-2 px-4 border-b-2 border-transparent transition-colors duration-300">Reviews</button>
+                            </div>
+                            <div id="tab-content-description" class="tab-content text-gray-700"></div>
+                            <div id="tab-content-specs" class="tab-content hidden text-gray-700"></div>
+                            <div id="tab-content-reviews" class="tab-content hidden text-gray-700">
+                                <div id="reviews-list"></div>
+                                <div class="mt-6">
+                                    <button id="write-review-btn" class="bg-sky-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-600 transition">Write a Review</button>
+                                    <form id="review-form" class="hidden mt-4 p-4 border rounded-lg bg-gray-50 space-y-4">
+                                        <h4 class="font-bold text-lg">Submit Your Review</h4>
+                                        <div>
+                                            <label for="reviewName" class="block text-sm font-medium text-gray-700">Your Name</label>
+                                            <input type="text" id="reviewName" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">Rating</label>
+                                            <div class="review-form-stars flex space-x-1 mt-1" data-rating="0">
+                                                <span class="star-wrapper cursor-pointer" data-value="1"><i data-feather="star" class="w-6 h-6"></i></span>
+                                                <span class="star-wrapper cursor-pointer" data-value="2"><i data-feather="star" class="w-6 h-6"></i></span>
+                                                <span class="star-wrapper cursor-pointer" data-value="3"><i data-feather="star" class="w-6 h-6"></i></span>
+                                                <span class="star-wrapper cursor-pointer" data-value="4"><i data-feather="star" class="w-6 h-6"></i></span>
+                                                <span class="star-wrapper cursor-pointer" data-value="5"><i data-feather="star" class="w-6 h-6"></i></span>
+                                            </div>
+                                            <p id="rating-error" class="text-red-500 text-sm mt-1 hidden">Please select a rating.</p>
+                                        </div>
+                                        <div>
+                                            <label for="reviewComment" class="block text-sm font-medium text-gray-700">Comment</label>
+                                            <textarea id="reviewComment" rows="3" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500"></textarea>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition">Submit Review</button>
+                                            <button type="button" id="cancel-review-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- You may also like -->
+                <div class="mt-12 border-t pt-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">You May Also Like</h3>
+                    <div id="related-products-grid" class="grid grid-flow-col auto-cols-max gap-6 overflow-x-auto pb-4">
+                        <!-- Related products injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Shopping Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-end hidden">
+        <div id="cart-modal-content" class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col modal-enter">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold">Your Cart</h2>
+                <button id="close-cart-modal-btn" class="text-gray-500 hover:text-gray-800"><i data-feather="x" class="w-8 h-8"></i></button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <!-- Discount Section -->
+                <div class="mb-4">
+                    <label for="discountCodeInput" class="block text-sm font-medium text-gray-700 mb-2">Have a discount code?</label>
+                    <div class="flex">
+                        <input type="text" id="discountCodeInput" placeholder="Enter code" class="flex-grow px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <button id="apply-discount-btn" class="bg-sky-500 text-white px-4 py-2 rounded-r-md hover:bg-sky-600 transition btn-click-effect">Apply</button>
+                    </div>
+                    <p id="discount-message" class="text-sm mt-2"></p>
+                </div>
 
-        // --- SCRIPT LOGIC ---
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get elements from the DOM
-            const orderIdElement = document.getElementById('orderId');
-            const countdownElement = document.getElementById('countdown');
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-lg font-semibold">Subtotal</span>
+                    <span id="cart-subtotal" class="text-lg font-bold">₹0.00</span>
+                </div>
+                <div id="discount-display" class="flex justify-between items-center mb-4 hidden">
+                    <span class="text-md font-semibold text-green-700">Discount Applied</span>
+                    <span id="discount-amount" class="text-md font-bold text-green-700">- ₹0.00</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xl font-bold">Total</span>
+                    <span id="cart-total" class="text-xl font-bold text-sky-700">₹0.00</span>
+                </div>
+                <button id="checkout-btn" class="w-full bg-pink-500 text-white font-bold py-3 rounded-lg hover:bg-pink-600 transition btn-click-effect">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
 
-            // Generate a random 6-digit order ID
-            const orderId = Math.floor(100000 + Math.random() * 900000);
+    <!-- Delivery Details Modal -->
+    <div id="delivery-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto modal-enter">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold">Delivery Details</h2>
+                <button id="close-delivery-modal-btn" class="text-gray-500 hover:text-gray-800"><i data-feather="x" class="w-8 h-8"></i></button>
+            </div>
+            <form id="delivery-form" class="p-6 space-y-4">
+                <div>
+                    <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+                    <textarea id="address" name="address" rows="3" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500"></textarea>
+                </div>
+                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                        <input type="text" id="city" name="city" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label for="pincode" class="block text-sm font-medium text-gray-700">Pincode</label>
+                        <input type="text" id="pincode" name="pincode" required pattern="[0-9]{6}" title="Enter a 6-digit pincode" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" title="Enter a 10-digit phone number" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                </div>
+                <button type="submit" id="confirm-order-btn" class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition btn-click-effect flex items-center justify-center space-x-2">
+                    <span id="confirm-order-text">Confirm Order & Pay</span>
+                    <div id="confirm-order-spinner" class="spinner hidden"></div>
+                </button>
+            </form>
+        </div>
+    </div>
 
-            // Display the Order ID
-            if (orderIdElement) {
-                orderIdElement.innerText = `#${orderId}`;
+    <!-- Checkout Success Modal -->
+    <div id="checkout-success-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl text-center p-8 max-w-sm mx-auto modal-enter">
+            <i data-feather="check-circle" class="w-16 h-16 text-green-500 mx-auto mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
+            <p class="text-gray-600 mb-6">Your order has been placed successfully.</p>
+            <button id="close-checkout-modal-btn" class="bg-sky-500 text-white font-bold py-2 px-6 rounded-full hover:bg-sky-600 transition btn-click-effect">Continue Shopping</button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, getDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6d4IFA1q5JLQjWiCI46CYr_zWdklvoNs",
+            authDomain: "tddd-ff95c.firebaseapp.com",
+            projectId: "tddd-ff95c",
+            storageBucket: "tddd-ff95c.appspot.com",
+            messagingSenderId: "739673617101",
+            appId: "1:739673617101:web:2840eb62258a6ca4feef84"
+        };
+        
+        let products = [];
+        let cart = [];
+        let currentProductId = null;
+        let appliedDiscount = null; // Stores the currently applied discount object
+        let razorpayKeyId = ''; // To store the Razorpay Key ID fetched from Firestore
+
+        // --- Main App Initialization ---
+        async function main() {
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth(app);
+
+            try {
+                // Sign in anonymously to allow read/write access to public data
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Anonymous sign-in failed:", error);
+                // Provide user-friendly instructions if anonymous auth is not enabled
+                if (error.code === 'auth/admin-restricted-operation' || error.code === 'auth/operation-not-allowed') {
+                     document.body.innerHTML = `<div class="p-8 text-center">
+                        <h1 class="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
+                        <p class="mb-4">Anonymous sign-in is not enabled in your Firebase project.</p>
+                        <p class="text-left">Please follow these steps to fix this:</p>
+                        <ol class="list-decimal list-inside text-left space-y-2 mt-2 bg-gray-100 p-4 rounded-md">
+                            <li>Go to your <a href="https://console.firebase.google.com/" target="_blank" class="text-blue-600 underline">Firebase Console</a>.</li>
+                            <li>Select your project: <strong>tddd-ff95c</strong></li>
+                            <li>Navigate to <strong>Build > Authentication</strong>.</li>
+                            <li>Click the <strong>Sign-in method</strong> tab.</li>
+                            <li>Find <strong>Anonymous</strong> in the list and click it.</li>
+                            <li>Toggle the <strong>Enable</strong> switch on and click <strong>Save</strong>.</li>
+                            <li>Refresh this page.</li>
+                        </ol>
+                    </div>`;
+                }
+                return;
             }
 
-            // Create the pre-filled WhatsApp message
-            const message = `Hi, my payment was successful. My Order ID is: #${orderId}`;
+            // Firebase Collection References
+            const productsCollection = collection(db, 'products');
+            const categoriesCollection = collection(db, 'categories');
+            const customersCollection = collection(db, 'customers');
+            const discountsCollection = collection(db, 'discounts'); // Reference to the discounts collection
+            const siteContentRef = doc(db, 'site_content', 'main'); // Document for site-wide content
 
-            // Construct the WhatsApp redirect URL
-            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            // --- UI Elements ---
+            const productGrid = document.getElementById('product-grid');
+            const categoryGrid = document.getElementById('category-grid');
+            const productModal = document.getElementById('product-modal');
+            const cartModal = document.getElementById('cart-modal');
+            const deliveryModal = document.getElementById('delivery-modal');
+            const checkoutModal = document.getElementById('checkout-success-modal');
+            const cartToast = document.getElementById('cart-toast');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountSpan = document.getElementById('cart-count');
+            const cartSubtotalSpan = document.getElementById('cart-subtotal');
+            const cartTotalSpan = document.getElementById('cart-total'); // New: Total after discount
+            const discountCodeInput = document.getElementById('discountCodeInput'); // New: Discount input
+            const applyDiscountBtn = document.getElementById('apply-discount-btn'); // New: Apply discount button
+            const discountMessage = document.getElementById('discount-message'); // New: Discount message
+            const discountDisplay = document.getElementById('discount-display'); // New: Discount display
+            const discountAmountSpan = document.getElementById('discount-amount'); // New: Discount amount
+            const confirmOrderBtn = document.getElementById('confirm-order-btn');
+            const confirmOrderText = document.getElementById('confirm-order-text');
+            const confirmOrderSpinner = document.getElementById('confirm-order-spinner');
 
-            // Start the countdown timer
-            let secondsLeft = redirectTimeout;
-            if (countdownElement) {
-                countdownElement.innerText = secondsLeft;
-                const interval = setInterval(() => {
-                    secondsLeft--;
-                    if (countdownElement) {
-                       countdownElement.innerText = secondsLeft;
-                    }
-                    if (secondsLeft <= 0) {
-                        clearInterval(interval);
-                        // Redirect to WhatsApp
-                        window.location.href = whatsappURL;
-                    }
-                }, 1000);
+
+            // --- Helper Functions ---
+
+            // Function to show a toast message
+            function showToast(message, type = 'info') {
+                cartToast.textContent = message;
+                cartToast.classList.remove('hidden', 'opacity-0', 'bg-green-500', 'bg-red-500', 'bg-blue-500');
+                if (type === 'success') {
+                    cartToast.classList.add('bg-green-500');
+                } else if (type === 'error') {
+                    cartToast.classList.add('bg-red-500');
+                } else {
+                    cartToast.classList.add('bg-blue-500'); // Default to blue for info/warnings
+                }
+                cartToast.classList.add('toast-animation');
+                setTimeout(() => {
+                    cartToast.classList.add('opacity-0');
+                    cartToast.classList.remove('toast-animation');
+                    // Add hidden after animation completes to avoid interference
+                    setTimeout(() => cartToast.classList.add('hidden'), 300); 
+                }, 2700); // Duration matches CSS animation
             }
 
-            // Fallback redirect in case the interval fails
-            setTimeout(() => {
-                window.location.href = whatsappURL;
-            }, redirectTimeout * 1000);
+            // Function to calculate average rating
+            function calculateAverageRating(reviews) {
+                if (!reviews || reviews.length === 0) return { avg: 0, count: 0 };
+                const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+                return {
+                    avg: (totalRating / reviews.length).toFixed(1),
+                    count: reviews.length
+                };
+            }
+
+            // Function to render star rating for display
+            function renderStars(rating, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                const fullStars = Math.floor(rating);
+                const halfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+                for (let i = 0; i < fullStars; i++) {
+                    const star = document.createElement('i');
+                    star.setAttribute('data-feather', 'star');
+                    star.classList.add('w-4', 'h-4', 'text-amber-500', 'fill-current');
+                    container.appendChild(star);
+                }
+                if (halfStar) {
+                    const star = document.createElement('i');
+                    star.setAttribute('data-feather', 'star');
+                    star.classList.add('w-4', 'h-4', 'text-amber-500', 'fill-current'); // Feather icons don't have half stars, use full for simplicity
+                    container.appendChild(star);
+                }
+                for (let i = 0; i < emptyStars; i++) {
+                    const star = document.createElement('i');
+                    star.setAttribute('data-feather', 'star');
+                    star.classList.add('w-4', 'h-4', 'text-gray-300');
+                    container.appendChild(star);
+                }
+                feather.replace();
+            }
+
+            // Function to render star rating for review form (interactive)
+            function setupReviewFormStars(container) {
+                const starWrappers = container.querySelectorAll('.star-wrapper');
+                let selectedRating = 0;
+
+                starWrappers.forEach(starWrapper => {
+                    const starIcon = starWrapper.querySelector('i');
+                    const starValue = parseInt(starWrapper.dataset.value);
+
+                    const updateStarColors = (rating) => {
+                        starWrappers.forEach(s => {
+                            const val = parseInt(s.dataset.value);
+                            const icon = s.querySelector('i');
+                            if (val <= rating) {
+                                icon.classList.add('filled');
+                            } else {
+                                icon.classList.remove('filled');
+                            }
+                        });
+                    };
+
+                    starWrapper.addEventListener('mouseover', () => updateStarColors(starValue));
+                    starWrapper.addEventListener('mouseout', () => updateStarColors(selectedRating));
+                    starWrapper.addEventListener('click', () => {
+                        selectedRating = starValue;
+                        container.dataset.rating = selectedRating;
+                        updateStarColors(selectedRating);
+                    });
+                });
+                return {
+                    getRating: () => selectedRating,
+                    setRating: (rating) => {
+                        selectedRating = rating;
+                        container.dataset.rating = selectedRating;
+                        updateStarColors(selectedRating);
+                    }
+                };
+            }
+
+            // Helper for custom modal transitions
+            const openModal = (modalEl) => {
+                modalEl.classList.remove('hidden');
+                setTimeout(() => {
+                    const content = modalEl.querySelector('.modal-enter');
+                    if (content) {
+                        content.classList.add('modal-enter-active');
+                    }
+                }, 10);
+            };
+
+            const closeModal = (modalEl) => {
+                const content = modalEl.querySelector('.modal-enter');
+                if (content) {
+                    content.classList.remove('modal-enter-active');
+                    content.classList.add('modal-leave-active');
+                    setTimeout(() => {
+                        modalEl.classList.add('hidden');
+                        content.classList.remove('modal-leave-active');
+                    }, 300); // Matches CSS transition duration
+                } else {
+                    modalEl.classList.add('hidden');
+                }
+            };
+
+            // --- Dynamic Content Rendering (Firebase Listeners) ---
+
+            // Listen for site content updates
+            onSnapshot(siteContentRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('hero-title').textContent = data.heroTitle || 'Unleash Imagination';
+                    document.getElementById('hero-subtitle').textContent = data.heroSubtitle || 'Discover a world of wonder...';
+                    document.getElementById('footer-email').textContent = `Email: ${data.contactEmail || 'support@toytopia.com'}`;
+                    document.getElementById('footer-phone').textContent = `Phone: ${data.contactPhone || '+91 12345 67890'}`;
+                    document.getElementById('facebook-link').href = data.facebookUrl || '#';
+                    document.getElementById('instagram-link').href = data.instagramUrl || '#';
+                    document.getElementById('twitter-link').href = data.twitterUrl || '#';
+
+                    // Update Razorpay Key ID
+                    razorpayKeyId = data.razorpayKeyId || '';
+                }
+            });
+
+            // Listen for products updates and re-render the grid
+            onSnapshot(productsCollection, (snapshot) => {
+                products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProducts(products);
+                // If product modal is open and the current product was updated, re-render it
+                if (productModal.classList.contains('flex') && currentProductId) {
+                    const updatedProduct = products.find(p => p.id === currentProductId);
+                    if (updatedProduct) {
+                        displayProductDetails(updatedProduct);
+                    } else {
+                        closeModal(productModal); // Product might have been deleted
+                    }
+                }
+            });
+            
+            // Listen for categories updates and re-render the category grid
+            onSnapshot(categoriesCollection, (snapshot) => {
+                const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCategories(categories);
+            });
+
+            // Function to render products on the main page
+            const renderProducts = (productsToRender) => {
+                productGrid.innerHTML = '';
+                // Display first 4 products as featured, adjust as needed
+                productsToRender.slice(0, 4).forEach(p => productGrid.appendChild(createProductCard(p)));
+                feather.replace(); // Ensure icons in new cards are rendered
+            };
+
+            // Function to render categories on the main page
+            const renderCategories = (categories) => {
+                categoryGrid.innerHTML = '';
+                const colors = ['sky', 'pink', 'amber', 'teal']; // Define colors for categories
+                categories.forEach((cat, i) => {
+                    const color = colors[i % colors.length];
+                    const catEl = document.createElement('a');
+                    catEl.href = '#shop'; // Link to the shop section
+                    catEl.className = 'group flex flex-col items-center p-4 rounded-xl hover:shadow-lg transition-all duration-300';
+                    catEl.innerHTML = `
+                        <div class="bg-${color}-100 rounded-full p-6 flex justify-center items-center w-32 h-32 group-hover:bg-${color}-200 transition-colors duration-300">
+                            <i data-feather="gift" class="w-16 h-16 text-${color}-500"></i>
+                        </div>
+                        <h3 class="mt-4 font-bold text-lg text-gray-700 text-center">${cat.name}</h3>
+                    `;
+                    categoryGrid.appendChild(catEl);
+                });
+                feather.replace(); // Ensure icons in new category cards are rendered
+            };
+
+            // Function to create a product card for the grid
+            const createProductCard = (product) => {
+                const card = document.createElement('div');
+                card.className = "product-card bg-white rounded-xl shadow-lg overflow-hidden group transition duration-300 hover:shadow-2xl hover:-translate-y-2";
+                card.innerHTML = `
+                    <div class="overflow-hidden cursor-pointer" data-product-id="${product.id}">
+                        <img src="${product.images[0] || 'https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found'}" alt="${product.name}" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${product.name}</h3>
+                        <p class="text-gray-500 text-sm mb-4">${product.category}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-sky-600">₹${product.price ? product.price.toLocaleString('en-IN') : 'N/A'}</span>
+                            <button data-product-id="${product.id}" class="add-to-cart-btn bg-teal-500 text-white px-5 py-2.5 rounded-full hover:bg-teal-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg font-bold btn-click-effect">
+                                <span class="btn-add-state flex items-center space-x-2"><i data-feather="shopping-bag" class="w-5 h-5"></i><span class="btn-text">Add</span></span>
+                                <span class="btn-added-state hidden items-center space-x-2"><i data-feather="check" class="w-5 h-5"></i><span class="btn-text">Added!</span></span>
+                            </button>
+                        </div>
+                    </div>`;
+                return card;
+            };
+
+            // --- Product Modal Logic ---
+
+            // Opens the product detail modal
+            const openProductModal = async (productId) => {
+                currentProductId = productId;
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    displayProductDetails(product);
+                    openModal(productModal);
+                    // Set default active tab
+                    document.querySelectorAll('.modal-tab').forEach(tab => tab.classList.remove('active'));
+                    document.getElementById('tab-content-description').classList.remove('hidden');
+                    document.getElementById('tab-content-specs').classList.add('hidden');
+                    document.getElementById('tab-content-reviews').classList.add('hidden');
+                    document.querySelector('.modal-tab[data-tab="description"]').classList.add('active');
+                }
+            };
+
+            // Populates the product detail modal with data
+            const displayProductDetails = (product) => {
+                document.getElementById('modal-main-image').src = product.images[0] || 'https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';
+                document.getElementById('modal-main-image').alt = product.name;
+                document.getElementById('modal-product-name').textContent = product.name;
+                document.getElementById('modal-product-category').textContent = product.category;
+                document.getElementById('modal-product-price').textContent = `₹${product.price.toLocaleString('en-IN')}`;
+                document.querySelector('#product-modal .add-to-cart-btn').dataset.productId = product.id;
+
+                // Render image thumbnails
+                const thumbnailsContainer = document.getElementById('modal-thumbnails');
+                thumbnailsContainer.innerHTML = '';
+                product.images.forEach((imgUrl, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.alt = `${product.name} Thumbnail ${index + 1}`;
+                    img.className = `thumbnail w-full h-20 object-cover rounded-md cursor-pointer border-2 border-transparent transition-all duration-200 ${index === 0 ? 'active' : ''}`;
+                    img.onerror = () => img.src = 'https://placehold.co/100x100/cccccc/ffffff?text=Img';
+                    img.addEventListener('click', () => {
+                        document.getElementById('modal-main-image').src = imgUrl;
+                        document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+                        img.classList.add('active');
+                    });
+                    thumbnailsContainer.appendChild(img);
+                });
+
+                // Display offer if available
+                const offerBanner = document.getElementById('modal-offer-banner');
+                if (product.offer && product.offer.title && product.offer.description) {
+                    document.getElementById('modal-offer-title').textContent = product.offer.title;
+                    document.getElementById('modal-offer-description').textContent = product.offer.description;
+                    offerBanner.classList.remove('hidden');
+                } else {
+                    offerBanner.classList.add('hidden');
+                }
+
+                // Populate tabs
+                document.getElementById('tab-content-description').innerHTML = `<p>${product.details.description}</p>`;
+                document.getElementById('tab-content-specs').innerHTML = `<ul>${product.details.specifications}</ul>`; // Assuming specifications come as HTML list items
+
+                // Render reviews
+                renderReviews(product.reviews);
+
+                // Render related products (simple example: first 5 products excluding current one)
+                const relatedProductsGrid = document.getElementById('related-products-grid');
+                relatedProductsGrid.innerHTML = '';
+                const related = products.filter(p => p.id !== product.id).slice(0, 5);
+                related.forEach(p => {
+                    const card = createProductCard(p); // Re-use product card creation
+                    card.classList.remove('sm:grid-cols-2', 'lg:grid-cols-4'); // Remove grid classes
+                    card.classList.add('w-64', 'flex-shrink-0'); // Ensure horizontal scrolling
+                    relatedProductsGrid.appendChild(card);
+                });
+
+                feather.replace(); // Ensure new icons are rendered
+            };
+
+            // Closes the product detail modal
+            document.getElementById('close-product-modal-btn').addEventListener('click', () => {
+                closeModal(productModal);
+            });
+
+            // Product modal tab switching
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(`tab-content-${tab.dataset.tab}`).classList.remove('hidden');
+                    feather.replace();
+                });
+            });
+
+            // --- Review Logic ---
+
+            let reviewFormStarsControl; // To hold the control object for star rating
+
+            // Renders the list of reviews for the current product
+            const renderReviews = (reviews) => {
+                const reviewsList = document.getElementById('reviews-list');
+                reviewsList.innerHTML = ''; // Clear previous reviews
+
+                const { avg, count } = calculateAverageRating(reviews);
+                document.getElementById('modal-avg-rating').innerHTML = ''; // Clear existing stars
+                renderStars(avg, 'modal-avg-rating');
+                document.getElementById('modal-review-count').textContent = `(${count} reviews)`;
+
+                if (reviews && reviews.length > 0) {
+                    reviews.forEach(review => {
+                        const reviewEl = document.createElement('div');
+                        reviewEl.className = 'border-b border-gray-200 py-4 last:border-b-0';
+                        let stars = '';
+                        for (let i = 0; i < 5; i++) {
+                            stars += `<i data-feather="star" class="w-4 h-4 ${i < review.rating ? 'text-amber-500 fill-current' : 'text-gray-300'}"></i>`;
+                        }
+
+                        let adminReplyHtml = '';
+                        if (review.adminReply) {
+                            adminReplyHtml = `
+                                <div class="mt-3 pt-3 border-t bg-sky-50 p-3 rounded-md">
+                                    <p class="text-sm font-bold text-sky-800">Reply from ToyTopia:</p>
+                                    <p class="text-sm text-gray-600">${review.adminReply}</p>
+                                </div>
+                            `;
+                        }
+
+                        reviewEl.innerHTML = `
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-bold text-gray-800">${review.user}</span>
+                                <div class="flex">${stars}</div>
+                            </div>
+                            <p class="text-gray-700 text-sm">${review.comment}</p>
+                            ${adminReplyHtml}
+                        `;
+                        reviewsList.appendChild(reviewEl);
+                    });
+                } else {
+                    reviewsList.innerHTML = '<p class="text-gray-500">No reviews yet. Be the first to review!</p>';
+                }
+                feather.replace(); // Ensure new icons are rendered
+            };
+
+            // Initialize review form star interaction
+            const reviewFormStarsContainer = document.querySelector('.review-form-stars');
+            if (reviewFormStarsContainer) {
+                reviewFormStarsControl = setupReviewFormStars(reviewFormStarsContainer);
+            }
+
+            // Toggle review form visibility
+            document.getElementById('write-review-btn').addEventListener('click', () => {
+                const reviewForm = document.getElementById('review-form');
+                reviewForm.classList.toggle('hidden');
+                // Reset form when opening
+                if (!reviewForm.classList.contains('hidden')) {
+                    reviewForm.reset();
+                    reviewFormStarsControl.setRating(0); // Reset stars
+                    document.getElementById('rating-error').classList.add('hidden'); // Hide error
+                }
+            });
+
+            // Cancel review button
+            document.getElementById('cancel-review-btn').addEventListener('click', () => {
+                document.getElementById('review-form').classList.add('hidden');
+            });
+
+            // Submit review form
+            document.getElementById('review-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const reviewName = document.getElementById('reviewName');
+                const reviewComment = document.getElementById('reviewComment');
+                const rating = reviewFormStarsControl.getRating();
+                const ratingError = document.getElementById('rating-error');
+
+                let isValid = true;
+                if (!reviewName.value.trim()) {
+                    reviewName.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    reviewName.classList.remove('invalid');
+                }
+                if (!reviewComment.value.trim()) {
+                    reviewComment.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    reviewComment.classList.remove('invalid');
+                }
+                if (rating === 0) {
+                    ratingError.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    ratingError.classList.add('hidden');
+                }
+
+                if (!isValid) {
+                    showToast('Please fill in all required fields and select a rating.', 'error');
+                    return;
+                }
+
+                if (currentProductId) {
+                    const productDocRef = doc(db, 'products', currentProductId);
+                    const productDocSnap = await getDoc(productDocRef);
+
+                    if (productDocSnap.exists()) {
+                        const productData = productDocSnap.data();
+                        const newReview = {
+                            user: reviewName.value.trim(),
+                            rating: rating,
+                            comment: reviewComment.value.trim(),
+                            timestamp: new Date().toISOString(),
+                            adminReply: null // Initialize admin reply as null
+                        };
+                        const updatedReviews = [...(productData.reviews || []), newReview];
+
+                        try {
+                            await updateDoc(productDocRef, { reviews: updatedReviews });
+                            showToast('Review submitted successfully!', 'success');
+                            document.getElementById('review-form').classList.add('hidden'); // Hide form after submission
+                            e.target.reset(); // Clear form
+                            reviewFormStarsControl.setRating(0); // Reset stars visually
+                        } catch (error) {
+                            console.error("Error submitting review:", error);
+                            showToast('Failed to submit review. Please try again.', 'error');
+                        }
+                    }
+                }
+            });
+
+            // --- Shopping Cart Logic ---
+
+            // Function to update the cart UI
+            const updateCart = () => {
+                cartItemsContainer.innerHTML = ''; // Clear existing items
+                let subtotal = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty!</p>';
+                    cartCountSpan.classList.add('hidden');
+                } else {
+                    cartCountSpan.classList.remove('hidden');
+                    cartCountSpan.textContent = cart.length;
+                    cart.forEach((item, index) => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'flex items-center space-x-4 py-3 border-b border-gray-200 last:border-b-0';
+                        itemEl.innerHTML = `
+                            <img src="${item.images[0] || 'https://placehold.co/100x100/cccccc/ffffff?text=Product'}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/cccccc/ffffff?text=Product';">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold text-gray-800">${item.name}</h4>
+                                <p class="text-sm text-gray-600">₹${item.price.toLocaleString('en-IN')}</p>
+                            </div>
+                            <button data-index="${index}" class="remove-from-cart-btn text-red-500 hover:text-red-700 transition">
+                                <i data-feather="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        `;
+                        cartItemsContainer.appendChild(itemEl);
+                        subtotal += item.price;
+                    });
+                }
+                
+                cartSubtotalSpan.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+                
+                let finalTotal = subtotal;
+                if (appliedDiscount) {
+                    let discountAmount = 0;
+                    if (appliedDiscount.type === 'percentage') {
+                        discountAmount = subtotal * (appliedDiscount.value / 100);
+                    } else if (appliedDiscount.type === 'fixed') {
+                        discountAmount = appliedDiscount.value;
+                    }
+                    finalTotal = Math.max(0, subtotal - discountAmount); // Ensure total doesn't go below zero
+                    discountAmountSpan.textContent = `- ₹${discountAmount.toLocaleString('en-IN')}`;
+                    discountDisplay.classList.remove('hidden');
+                } else {
+                    discountDisplay.classList.add('hidden');
+                }
+                cartTotalSpan.textContent = `₹${finalTotal.toLocaleString('en-IN')}`;
+
+                feather.replace(); // Re-render icons after cart update
+            };
+
+            // Add to cart button handler (from product card and modal)
+            document.addEventListener('click', (e) => {
+                const addToCartBtn = e.target.closest('.add-to-cart-btn');
+                if (addToCartBtn) {
+                    const productId = addToCartBtn.dataset.productId;
+                    const productToAdd = products.find(p => p.id === productId);
+                    if (productToAdd && !cart.some(item => item.id === productId)) {
+                        cart.push(productToAdd);
+                        updateCart();
+                        showToast('Item added to cart!', 'success');
+
+                        // Visual feedback on button
+                        const addState = addToCartBtn.querySelector('.btn-add-state');
+                        const addedState = addToCartBtn.querySelector('.btn-added-state');
+                        if (addState && addedState) {
+                            addState.classList.add('hidden');
+                            addedState.classList.remove('hidden');
+                            setTimeout(() => {
+                                addState.classList.remove('hidden');
+                                addedState.classList.add('hidden');
+                            }, 1500); // Show "Added!" for 1.5 seconds
+                        }
+                    } else {
+                        showToast('Item already in cart!', 'info');
+                    }
+                }
+            });
+
+            // Remove from cart button handler
+            cartItemsContainer.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-from-cart-btn');
+                if (removeBtn) {
+                    const indexToRemove = parseInt(removeBtn.dataset.index);
+                    cart.splice(indexToRemove, 1);
+                    appliedDiscount = null; // Reset discount if cart changes
+                    discountCodeInput.value = '';
+                    discountMessage.textContent = '';
+                    updateCart();
+                    showToast('Item removed from cart!', 'info');
+                }
+            });
+
+            // Open cart modal
+            document.getElementById('cart-button').addEventListener('click', () => {
+                openModal(cartModal);
+                updateCart(); // Ensure cart is up-to-date when opened
+            });
+
+            // Close cart modal
+            document.getElementById('close-cart-modal-btn').addEventListener('click', () => {
+                closeModal(cartModal);
+            });
+
+            // Proceed to checkout button
+            document.getElementById('checkout-btn').addEventListener('click', () => {
+                if (cart.length === 0) {
+                    showToast('Your cart is empty. Add some toys first!', 'error');
+                    return;
+                }
+                closeModal(cartModal);
+                openModal(deliveryModal);
+            });
+
+            // --- Discount Application Logic ---
+            applyDiscountBtn.addEventListener('click', async () => {
+                const code = discountCodeInput.value.trim().toUpperCase();
+                discountMessage.textContent = '';
+                appliedDiscount = null; // Reset previous discount
+
+                if (!code) {
+                    discountMessage.textContent = 'Please enter a discount code.';
+                    discountMessage.classList.remove('text-green-600', 'text-red-600');
+                    discountMessage.classList.add('text-yellow-600');
+                    updateCart(); // Recalculate total with no discount
+                    return;
+                }
+
+                try {
+                    // Fetch all discounts to find a match (Firestore doesn't support query on case-insensitive 'code' directly)
+                    const querySnapshot = await getDocs(discountsCollection);
+                    const allDiscounts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    const foundDiscount = allDiscounts.find(d => d.code === code);
+
+                    if (foundDiscount) {
+                        const now = new Date();
+                        const expiryDate = foundDiscount.expiryDate ? new Date(foundDiscount.expiryDate) : null;
+
+                        if (foundDiscount.isActive && (!expiryDate || now <= expiryDate)) {
+                            appliedDiscount = foundDiscount;
+                            discountMessage.textContent = `Discount '${foundDiscount.code}' applied!`;
+                            discountMessage.classList.remove('text-yellow-600', 'text-red-600');
+                            discountMessage.classList.add('text-green-600');
+                        } else {
+                            discountMessage.textContent = 'Discount code is expired or inactive.';
+                            discountMessage.classList.remove('text-green-600', 'text-yellow-600');
+                            discountMessage.classList.add('text-red-600');
+                        }
+                    } else {
+                        discountMessage.textContent = 'Invalid discount code.';
+                        discountMessage.classList.remove('text-green-600', 'text-yellow-600');
+                        discountMessage.classList.add('text-red-600');
+                    }
+                } catch (error) {
+                    console.error("Error applying discount:", error);
+                    discountMessage.textContent = 'Error applying discount. Please try again.';
+                    discountMessage.classList.remove('text-green-600', 'text-yellow-600');
+                    discountMessage.classList.add('text-red-600');
+                }
+                updateCart(); // Update cart display with applied discount (or reset)
+            });
+
+            // --- Delivery and Checkout Modals ---
+            document.getElementById('delivery-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('fullName');
+                const address = document.getElementById('address');
+                const city = document.getElementById('city');
+                const pincode = document.getElementById('pincode');
+                const phone = document.getElementById('phone');
+
+                // Simple client-side validation
+                let isValid = true;
+                [fullName, address, city, pincode, phone].forEach(input => {
+                    if (!input.value.trim() || !input.checkValidity()) {
+                        input.classList.add('invalid');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    showToast('Please fill in all details correctly.', 'error');
+                    return;
+                }
+
+                const customerDetails = {
+                    fullName: fullName.value.trim(),
+                    address: address.value.trim(),
+                    city: city.value.trim(),
+                    pincode: pincode.value.trim(),
+                    phone: phone.value.trim(),
+                };
+                
+                const orderTotal = parseFloat(cartTotalSpan.textContent.replace('₹', '').replace(/,/g, ''));
+
+                if (!razorpayKeyId) {
+                    showToast('Razorpay Key ID is not configured. Please set it in the Admin Panel.', 'error');
+                    return;
+                }
+
+                // Show loading spinner
+                confirmOrderText.classList.add('hidden');
+                confirmOrderSpinner.classList.remove('hidden');
+                confirmOrderBtn.disabled = true;
+
+                try {
+                    await initiateRazorpayPayment(customerDetails, orderTotal);
+                } catch (error) {
+                    console.error("Razorpay payment initiation failed:", error);
+                    showToast('Payment failed or cancelled. Please try again.', 'error');
+                    // Hide spinner, enable button
+                    confirmOrderText.classList.remove('hidden');
+                    confirmOrderSpinner.classList.add('hidden');
+                    confirmOrderBtn.disabled = false;
+                }
+            });
+
+            // --- Razorpay Payment Integration ---
+            async function initiateRazorpayPayment(customerDetails, amount) {
+                return new Promise((resolve, reject) => {
+                    const options = {
+                        key: razorpayKeyId, // Enter the Key ID generated from the Dashboard
+                        amount: amount * 100, // Amount is in currency subunits. Divide by 100 to get actual amount
+                        currency: "INR",
+                        name: "ToyTopia",
+                        description: "Purchase from ToyTopia",
+                        image: "https://placehold.co/100x100/A78BFA/ffffff?text=TT", // Placeholder for company logo
+                        handler: async function (response) {
+                            // Payment successful callback
+                            const orderData = {
+                                ...customerDetails,
+                                orderDate: new Date().toISOString(),
+                                cartItems: cart.map(item => ({ id: item.id, name: item.name, price: item.price })),
+                                subtotal: parseFloat(cartSubtotalSpan.textContent.replace('₹', '').replace(/,/g, '')),
+                                discountApplied: appliedDiscount ? { code: appliedDiscount.code, type: appliedDiscount.type, value: appliedDiscount.value } : null,
+                                totalAmount: parseFloat(cartTotalSpan.textContent.replace('₹', '').replace(/,/g, '')),
+                                razorpayPaymentId: response.razorpay_payment_id,
+                                paymentStatus: 'completed'
+                            };
+
+                            try {
+                                await addDoc(customersCollection, orderData); // Saves customer and order data
+                                cart = []; // Clear cart after successful order
+                                appliedDiscount = null; // Clear applied discount
+                                discountCodeInput.value = ''; // Clear discount input
+                                discountMessage.textContent = ''; // Clear discount message
+                                updateCart(); // Update cart UI
+                                closeModal(deliveryModal); // Close delivery modal
+                                openModal(checkoutModal); // Show success modal
+                                document.getElementById('delivery-form').reset(); // Clear delivery form
+                                feather.replace(); // Ensure icons are updated
+                                showToast('Payment successful! Your order has been placed.', 'success');
+                                resolve(true);
+                            } catch (error) {
+                                console.error("Error saving customer data after successful payment:", error);
+                                showToast("Order placed, but there was an issue recording it. Please contact support.", 'error');
+                                reject(error); // Reject if Firestore save fails
+                            } finally {
+                                confirmOrderText.classList.remove('hidden');
+                                confirmOrderSpinner.classList.add('hidden');
+                                confirmOrderBtn.disabled = false;
+                            }
+                        },
+                        prefill: {
+                            name: customerDetails.fullName,
+                            email: "customer@example.com", // You might want to collect customer email earlier
+                            contact: customerDetails.phone
+                        },
+                        notes: {
+                            address: `${customerDetails.address}, ${customerDetails.city}, ${customerDetails.pincode}`
+                        },
+                        theme: {
+                            color: "#0ea5e9" // Tailwind's sky-500
+                        }
+                    };
+
+                    const rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response){
+                        console.error("Payment failed:", response.error);
+                        showToast(`Payment failed: ${response.error.description}`, 'error');
+                        reject(new Error('Payment failed'));
+                    });
+                    rzp1.on('modal.closed', function() {
+                        console.log("Payment modal closed by user.");
+                        showToast('Payment was cancelled.', 'info');
+                        reject(new Error('Payment cancelled'));
+                    });
+                    rzp1.open();
+                });
+            }
+
+
+            document.getElementById('close-delivery-modal-btn').addEventListener('click', () => {
+                closeModal(deliveryModal);
+            });
+
+            document.getElementById('close-checkout-modal-btn').addEventListener('click', () => {
+                closeModal(checkoutModal);
+            });
+
+            // Initial cart update to ensure correct display on load
+            updateCart(); 
+        }
+
+        // Initialize Feather icons after the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Search bar toggle
+            const searchBtn = document.getElementById('search-btn');
+            const searchBar = document.getElementById('search-bar');
+            searchBtn.addEventListener('click', () => {
+                searchBar.classList.toggle('hidden');
+                if (!searchBar.classList.contains('hidden')) {
+                     searchBar.classList.add('search-bar-enter-active');
+                     searchBar.classList.remove('search-bar-enter');
+                } else {
+                    searchBar.classList.add('search-bar-leave-active');
+                    searchBar.classList.remove('search-bar-enter-active');
+                    setTimeout(() => {
+                        searchBar.classList.remove('search-bar-leave-active');
+                        searchBar.classList.add('search-bar-enter');
+                    }, 300); // Matches transition duration
+                }
+            });
+
+            // Delegate click events for product cards to open modal
+            document.getElementById('product-grid').addEventListener('click', (e) => {
+                const productCard = e.target.closest('.product-card > div:first-child'); // Target the image/clickable area
+                if (productCard && productCard.dataset.productId) {
+                    const productId = productCard.dataset.productId;
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        openProductModal(productId);
+                    }
+                }
+            });
+            // Delegate click events for related products to open modal
+            document.getElementById('related-products-grid').addEventListener('click', (e) => {
+                const productCard = e.target.closest('.product-card > div:first-child');
+                if (productCard && productCard.dataset.productId) {
+                    const productId = productCard.dataset.productId;
+                    const product = products.find(p => p.id === productId);
+                    if (product) {
+                        openProductModal(productId);
+                    }
+                }
+            });
         });
-    </script>
 
+        // Run the main application logic
+        main().catch(console.error);
+    </script>
 </body>
 </html>
