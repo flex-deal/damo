@@ -178,7 +178,6 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-4xl font-extrabold text-center text-gray-800 mb-12">Our Featured Toys</h2>
                 <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Changed from grid-cols-1 sm:grid-cols-2 to grid-cols-2 -->
                     <!-- Product Cards will be injected here by JS -->
                 </div>
             </div>
@@ -369,9 +368,13 @@
                     <span class="text-lg font-semibold">Subtotal</span>
                     <span id="cart-subtotal" class="text-lg font-bold">₹0.00</span>
                 </div>
-                <div id="discount-display" class="flex justify-between items-center mb-4 hidden">
+                <div id="discount-display" class="flex justify-between items-center mb-2 hidden">
                     <span class="text-md font-semibold text-green-700">Discount Applied</span>
                     <span id="discount-amount" class="text-md font-bold text-green-700">- ₹0.00</span>
+                </div>
+                <div id="gst-display" class="flex justify-between items-center mb-2 hidden">
+                    <span class="text-md font-semibold text-gray-700">GST (<span id="cart-gst-percentage">0</span>%)</span>
+                    <span id="cart-gst-amount" class="text-md font-bold text-gray-700">₹0.00</span>
                 </div>
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-xl font-bold">Total</span>
@@ -452,6 +455,7 @@
         let currentProductId = null;
         let appliedDiscount = null; // Stores the currently applied discount object
         let razorpayKeyId = ''; // To store the Razorpay Key ID fetched from Firestore
+        let currentGstPercentage = 0; // Global variable to store current GST percentage
 
         // --- Main App Initialization ---
         async function main() {
@@ -488,8 +492,9 @@
             // Firebase Collection References
             const productsCollection = collection(db, 'products');
             const categoriesCollection = collection(db, 'categories');
-            const customersCollection = collection(db, 'customers');
+            const customersCollection = collection(db, 'customers'); // Still keep for historical customer data
             const discountsCollection = collection(db, 'discounts'); // Reference to the discounts collection
+            const ordersCollection = collection(db, 'orders'); // New: Dedicated orders collection
             const siteContentRef = doc(db, 'site_content', 'main'); // Document for site-wide content
 
             // --- UI Elements ---
@@ -509,6 +514,9 @@
             const discountMessage = document.getElementById('discount-message'); // New: Discount message
             const discountDisplay = document.getElementById('discount-display'); // New: Discount display
             const discountAmountSpan = document.getElementById('discount-amount'); // New: Discount amount
+            const gstDisplay = document.getElementById('gst-display'); // New: GST display container
+            const cartGstPercentageSpan = document.getElementById('cart-gst-percentage'); // New: GST percentage span
+            const cartGstAmountSpan = document.getElementById('cart-gst-amount'); // New: GST amount span
             const confirmOrderBtn = document.getElementById('confirm-order-btn');
             const confirmOrderText = document.getElementById('confirm-order-text');
             const confirmOrderSpinner = document.getElementById('confirm-order-spinner');
@@ -641,7 +649,7 @@
 
             // --- Dynamic Content Rendering (Firebase Listeners) ---
 
-            // Listen for site content updates
+            // Listen for site content updates (including Razorpay Key and GST)
             onSnapshot(siteContentRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -653,8 +661,9 @@
                     document.getElementById('instagram-link').href = data.instagramUrl || '#';
                     document.getElementById('twitter-link').href = data.twitterUrl || '#';
 
-                    // Update Razorpay Key ID
                     razorpayKeyId = data.razorpayKeyId || '';
+                    currentGstPercentage = data.gstPercentage !== undefined ? parseFloat(data.gstPercentage) : 0;
+                    updateCart(); // Recalculate cart totals when GST or other content changes
                 }
             });
 
@@ -664,7 +673,7 @@
                 console.log("Products loaded:", products); // Debugging: Check loaded products
                 renderProducts(products);
 
-                // Re-attach product click handlers after products are loaded/updated
+                // Attach product click handlers after products are loaded/updated
                 attachProductClickHandlers();
 
                 // If product modal is open and the current product was updated, re-render it
@@ -759,31 +768,27 @@
 
             // Function to attach click handlers for product cards
             const attachProductClickHandlers = () => {
-                // Clear existing listeners to prevent duplicates
-                // This is a bit tricky with delegated events. The current setup is generally fine
-                // because `addEventListener` on `product-grid` will only add the listener once.
-                // However, if we were attaching directly to .product-card, we'd need to remove old ones.
-
-                // Delegate click events for product cards to open modal
-                // Ensure this event listener is only added once.
+                // Clear existing listeners by re-attaching to ensure current `products` array is used
+                // Remove existing listeners first if they were attached directly to child elements
+                // For delegation, it's generally safe to add once to the parent if handling is idempotent
+                // For this scenario, ensuring the listener on `productGrid` is attached once is key.
                 if (!productGrid.dataset.clickHandlerAttached) {
                     productGrid.addEventListener('click', (e) => {
-                        const productCard = e.target.closest('.product-card [data-product-id]'); // Target the inner div with data-product-id
-                        if (productCard && productCard.dataset.productId) {
-                            const productId = productCard.dataset.productId;
+                        const productCardClickableArea = e.target.closest('.product-card [data-product-id]');
+                        if (productCardClickableArea) {
+                            const productId = productCardClickableArea.dataset.productId;
                             openProductModal(productId);
                         }
                     });
                     productGrid.dataset.clickHandlerAttached = true; // Mark as attached
                 }
 
-                // Delegate click events for related products to open modal
                 const relatedProductsGrid = document.getElementById('related-products-grid');
                 if (relatedProductsGrid && !relatedProductsGrid.dataset.clickHandlerAttached) {
                     relatedProductsGrid.addEventListener('click', (e) => {
-                        const productCard = e.target.closest('.product-card [data-product-id]');
-                        if (productCard && productCard.dataset.productId) {
-                            const productId = productCard.dataset.productId;
+                        const productCardClickableArea = e.target.closest('.product-card [data-product-id]');
+                        if (productCardClickableArea) {
+                            const productId = productCardClickableArea.dataset.productId;
                             openProductModal(productId);
                         }
                     });
@@ -1019,7 +1024,7 @@
                             <img src="${item.images[0] || 'https://placehold.co/100x100/cccccc/ffffff?text=Product'}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/cccccc/ffffff?text=Product';">
                             <div class="flex-grow">
                                 <h4 class="font-semibold text-gray-800">${item.name}</h4>
-                                <p class="text-sm text-gray-600">₹${item.price.toLocaleString('en-IN')}</p>
+                                <p class="text-sm text-gray-600">₹${item.price.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                             </div>
                             <button data-index="${index}" class="remove-from-cart-btn text-red-500 hover:text-red-700 transition">
                                 <i data-feather="trash-2" class="w-5 h-5"></i>
@@ -1030,23 +1035,36 @@
                     });
                 }
                 
-                cartSubtotalSpan.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+                cartSubtotalSpan.textContent = `₹${subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 
                 let finalTotal = subtotal;
+                let discountAmount = 0;
                 if (appliedDiscount) {
-                    let discountAmount = 0;
                     if (appliedDiscount.type === 'percentage') {
                         discountAmount = subtotal * (appliedDiscount.value / 100);
                     } else if (appliedDiscount.type === 'fixed') {
                         discountAmount = appliedDiscount.value;
                     }
                     finalTotal = Math.max(0, subtotal - discountAmount); // Ensure total doesn't go below zero
-                    discountAmountSpan.textContent = `- ₹${discountAmount.toLocaleString('en-IN')}`;
+                    discountAmountSpan.textContent = `- ₹${discountAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                     discountDisplay.classList.remove('hidden');
                 } else {
                     discountDisplay.classList.add('hidden');
                 }
-                cartTotalSpan.textContent = `₹${finalTotal.toLocaleString('en-IN')}`;
+
+                // Apply GST
+                let gstAmount = 0;
+                if (currentGstPercentage > 0) {
+                    gstAmount = finalTotal * (currentGstPercentage / 100);
+                    finalTotal += gstAmount;
+                    cartGstPercentageSpan.textContent = currentGstPercentage;
+                    cartGstAmountSpan.textContent = `₹${gstAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    gstDisplay.classList.remove('hidden');
+                } else {
+                    gstDisplay.classList.add('hidden');
+                }
+
+                cartTotalSpan.textContent = `₹${finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
                 feather.replace(); // Re-render icons after cart update
             };
@@ -1166,15 +1184,15 @@
             // --- Delivery and Checkout Modals ---
             document.getElementById('delivery-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const fullName = document.getElementById('fullName');
-                const address = document.getElementById('address');
-                const city = document.getElementById('city');
-                const pincode = document.getElementById('pincode');
-                const phone = document.getElementById('phone');
+                const fullNameInput = document.getElementById('fullName');
+                const addressInput = document.getElementById('address');
+                const cityInput = document.getElementById('city');
+                const pincodeInput = document.getElementById('pincode');
+                const phoneInput = document.getElementById('phone');
 
                 // Simple client-side validation
                 let isValid = true;
-                [fullName, address, city, pincode, phone].forEach(input => {
+                [fullNameInput, addressInput, cityInput, pincodeInput, phoneInput].forEach(input => {
                     if (!input.value.trim() || !input.checkValidity()) {
                         input.classList.add('invalid');
                         isValid = false;
@@ -1189,11 +1207,11 @@
                 }
 
                 const customerDetails = {
-                    fullName: fullName.value.trim(),
-                    address: address.value.trim(),
-                    city: city.value.trim(),
-                    pincode: pincode.value.trim(),
-                    phone: phone.value.trim(),
+                    fullName: fullNameInput.value.trim(),
+                    address: addressInput.value.trim(),
+                    city: cityInput.value.trim(),
+                    pincode: pincodeInput.value.trim(),
+                    phone: phoneInput.value.trim(),
                 };
                 
                 const orderTotal = parseFloat(cartTotalSpan.textContent.replace('₹', '').replace(/,/g, ''));
@@ -1211,7 +1229,7 @@
                 try {
                     await initiateRazorpayPayment(customerDetails, orderTotal);
                 } catch (error) {
-                    console.error("Razorpay payment initiation failed:", error);
+                    console.error("Razorpay payment initiation failed or cancelled:", error);
                     showToast('Payment failed or cancelled. Please try again.', 'error');
                     // Hide spinner, enable button
                     confirmOrderText.classList.remove('hidden');
@@ -1232,19 +1250,49 @@
                         image: "https://placehold.co/100x100/A78BFA/ffffff?text=TT", // Placeholder for company logo
                         handler: async function (response) {
                             // Payment successful callback
+                            // Prepare cart items for saving to order
+                            const orderCartItems = cart.map(item => ({
+                                id: item.id,
+                                name: item.name,
+                                price: item.price,
+                                quantity: 1 // Assuming quantity 1 for simplicity, can be expanded
+                            }));
+
                             const orderData = {
-                                ...customerDetails,
+                                customerName: customerDetails.fullName, // Match Admin Panel's 'Customer Name'
                                 orderDate: new Date().toISOString(),
-                                cartItems: cart.map(item => ({ id: item.id, name: item.name, price: item.price })),
+                                products: orderCartItems, // Array of products purchased
                                 subtotal: parseFloat(cartSubtotalSpan.textContent.replace('₹', '').replace(/,/g, '')),
                                 discountApplied: appliedDiscount ? { code: appliedDiscount.code, type: appliedDiscount.type, value: appliedDiscount.value } : null,
+                                gstPercentage: currentGstPercentage,
+                                gstAmount: parseFloat(cartGstAmountSpan.textContent.replace('₹', '').replace(/,/g, '')),
                                 totalAmount: parseFloat(cartTotalSpan.textContent.replace('₹', '').replace(/,/g, '')),
-                                razorpayPaymentId: response.razorpay_payment_id,
-                                paymentStatus: 'completed'
+                                paymentInfo: {
+                                    method: "Razorpay",
+                                    transactionId: response.razorpay_payment_id,
+                                    status: 'completed' // Payment gateway confirmed success
+                                },
+                                shippingAddress: {
+                                    street: customerDetails.address,
+                                    city: customerDetails.city,
+                                    pincode: customerDetails.pincode,
+                                    phone: customerDetails.phone
+                                },
+                                status: 'Processing' // Initial status after successful payment
                             };
 
                             try {
-                                await addDoc(customersCollection, orderData); // Saves customer and order data
+                                // Save order to the dedicated 'orders' collection
+                                await addDoc(ordersCollection, orderData); 
+                                
+                                // Optionally, save customer details to 'customers' collection if not already existing
+                                // This is for customer history, distinct from individual orders
+                                const customerQuery = await getDocs(collection(db, 'customers'));
+                                const existingCustomer = customerQuery.docs.find(doc => doc.data().phone === customerDetails.phone);
+                                if (!existingCustomer) {
+                                    await addDoc(customersCollection, customerDetails);
+                                }
+
                                 cart = []; // Clear cart after successful order
                                 appliedDiscount = null; // Clear applied discount
                                 discountCodeInput.value = ''; // Clear discount input
@@ -1257,7 +1305,7 @@
                                 showToast('Payment successful! Your order has been placed.', 'success');
                                 resolve(true);
                             } catch (error) {
-                                console.error("Error saving customer data after successful payment:", error);
+                                console.error("Error saving order or customer data after successful payment:", error);
                                 showToast("Order placed, but there was an issue recording it. Please contact support.", 'error');
                                 reject(error); // Reject if Firestore save fails
                             } finally {
