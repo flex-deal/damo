@@ -177,7 +177,8 @@
         <section id="shop" class="py-20 bg-sky-50">
             <div class="container mx-auto px-6">
                 <h2 class="text-4xl font-extrabold text-center text-gray-800 mb-12">Our Featured Toys</h2>
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Changed from grid-cols-1 sm:grid-cols-2 to grid-cols-2 -->
                     <!-- Product Cards will be injected here by JS -->
                 </div>
             </div>
@@ -660,7 +661,12 @@
             // Listen for products updates and re-render the grid
             onSnapshot(productsCollection, (snapshot) => {
                 products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Products loaded:", products); // Debugging: Check loaded products
                 renderProducts(products);
+
+                // Re-attach product click handlers after products are loaded/updated
+                attachProductClickHandlers();
+
                 // If product modal is open and the current product was updated, re-render it
                 if (productModal.classList.contains('flex') && currentProductId) {
                     const updatedProduct = products.find(p => p.id === currentProductId);
@@ -732,9 +738,11 @@
 
             // Opens the product detail modal
             const openProductModal = async (productId) => {
+                console.log("Attempting to open modal for productId:", productId); // Debugging
                 currentProductId = productId;
                 const product = products.find(p => p.id === productId);
                 if (product) {
+                    console.log("Product found:", product); // Debugging
                     displayProductDetails(product);
                     openModal(productModal);
                     // Set default active tab
@@ -743,8 +751,46 @@
                     document.getElementById('tab-content-specs').classList.add('hidden');
                     document.getElementById('tab-content-reviews').classList.add('hidden');
                     document.querySelector('.modal-tab[data-tab="description"]').classList.add('active');
+                } else {
+                    console.error("Product not found for ID:", productId); // Debugging
+                    showToast("Product details could not be loaded.", 'error');
                 }
             };
+
+            // Function to attach click handlers for product cards
+            const attachProductClickHandlers = () => {
+                // Clear existing listeners to prevent duplicates
+                // This is a bit tricky with delegated events. The current setup is generally fine
+                // because `addEventListener` on `product-grid` will only add the listener once.
+                // However, if we were attaching directly to .product-card, we'd need to remove old ones.
+
+                // Delegate click events for product cards to open modal
+                // Ensure this event listener is only added once.
+                if (!productGrid.dataset.clickHandlerAttached) {
+                    productGrid.addEventListener('click', (e) => {
+                        const productCard = e.target.closest('.product-card [data-product-id]'); // Target the inner div with data-product-id
+                        if (productCard && productCard.dataset.productId) {
+                            const productId = productCard.dataset.productId;
+                            openProductModal(productId);
+                        }
+                    });
+                    productGrid.dataset.clickHandlerAttached = true; // Mark as attached
+                }
+
+                // Delegate click events for related products to open modal
+                const relatedProductsGrid = document.getElementById('related-products-grid');
+                if (relatedProductsGrid && !relatedProductsGrid.dataset.clickHandlerAttached) {
+                    relatedProductsGrid.addEventListener('click', (e) => {
+                        const productCard = e.target.closest('.product-card [data-product-id]');
+                        if (productCard && productCard.dataset.productId) {
+                            const productId = productCard.dataset.productId;
+                            openProductModal(productId);
+                        }
+                    });
+                    relatedProductsGrid.dataset.clickHandlerAttached = true; // Mark as attached
+                }
+            };
+
 
             // Populates the product detail modal with data
             const displayProductDetails = (product) => {
@@ -1287,29 +1333,6 @@
                         searchBar.classList.remove('search-bar-leave-active');
                         searchBar.classList.add('search-bar-enter');
                     }, 300); // Matches transition duration
-                }
-            });
-
-            // Delegate click events for product cards to open modal
-            document.getElementById('product-grid').addEventListener('click', (e) => {
-                const productCard = e.target.closest('.product-card > div:first-child'); // Target the image/clickable area
-                if (productCard && productCard.dataset.productId) {
-                    const productId = productCard.dataset.productId;
-                    const product = products.find(p => p.id === productId);
-                    if (product) {
-                        openProductModal(productId);
-                    }
-                }
-            });
-            // Delegate click events for related products to open modal
-            document.getElementById('related-products-grid').addEventListener('click', (e) => {
-                const productCard = e.target.closest('.product-card > div:first-child');
-                if (productCard && productCard.dataset.productId) {
-                    const productId = productCard.dataset.productId;
-                    const product = products.find(p => p.id === productId);
-                    if (product) {
-                        openProductModal(productId);
-                    }
                 }
             });
         });
